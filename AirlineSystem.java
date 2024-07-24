@@ -60,6 +60,10 @@ public class AirlineSystem {
             System.out.println("0 Exit Program");
             System.out.print("Selection: ");
             
+            while (!scanner.hasNextInt()) {
+                System.out.print("Invalid input. Please enter a number: ");
+                scanner.next();
+            }
             userInput = scanner.nextInt();
             scanner.nextLine(); // Consume newline
             
@@ -134,6 +138,10 @@ public class AirlineSystem {
         System.out.println("0 Exit Graph Creation");
         System.out.print("Selection: ");
         
+        while (!scanner.hasNextInt()) {
+            System.out.print("Invalid input. Please enter a number: ");
+            scanner.next();
+        }
         int userInput = scanner.nextInt();
         return userInput;
     }
@@ -183,8 +191,12 @@ public class AirlineSystem {
         System.out.print("Enter the name of the new airport: ");
         String vertex = scanner.nextLine();
         
-        graph.addVertex(vertex);
-        System.out.println("Airport " + vertex + " added.");
+        if (vertex.isEmpty()) {
+            System.out.println("Airport name cannot be empty.");
+        } else {
+            graph.addVertex(vertex);
+            System.out.println("Airport " + vertex + " added.");
+        }
         
         pauseScreen(2000);
     }
@@ -197,8 +209,14 @@ public class AirlineSystem {
         System.out.print("Enter the destination airport: ");
         String destination = scanner.nextLine();
         
-        graph.addEdge(source, destination);
-        System.out.println("Flight added from " + source + " to " + destination);
+        if (!graph.getVertices().contains(source)) {
+            System.out.println("Source airport " + source + " does not exist.");
+        } else if (!graph.getVertices().contains(destination)) {
+            System.out.println("Destination airport " + destination + " does not exist.");
+        } else {
+            graph.addEdge(source, destination);
+            System.out.println("Flight added from " + source + " to " + destination);
+        }
         
         pauseScreen(2000);
     }
@@ -209,8 +227,12 @@ public class AirlineSystem {
         System.out.print("Enter the airport to remove: ");
         String vertex = scanner.nextLine();
         
-        graph.removeVertex(vertex);
-        System.out.println("Airport " + vertex + " removed.");
+        if (!graph.getVertices().contains(vertex)) {
+            System.out.println("Airport " + vertex + " does not exist.");
+        } else {
+            graph.removeVertex(vertex);
+            System.out.println("Airport " + vertex + " removed.");
+        }
         
         pauseScreen(2000);
     }
@@ -223,36 +245,46 @@ public class AirlineSystem {
         System.out.print("Enter the destination airport: ");
         String destination = scanner.nextLine();
         
-        graph.removeEdge(source, destination);
-        System.out.println("Flight removed from " + source + " to " + destination);
-        
-        pauseScreen(2000);
-    }
-
-    public void createNewStaff() {
-        clearScreen();
-        Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter new Staff ID: ");
-        String staffID = scanner.nextLine();
-        System.out.print("Enter password for new Staff: ");
-        String password = scanner.nextLine();
-        
-        Admin admin = (Admin) loggedInUser;
-        admin.createStaff(staffID, password, this);
-        System.out.println("New staff " + staffID + " created.");
+        if (!graph.getVertices().contains(source)) {
+            System.out.println("Source airport " + source + " does not exist.");
+        } else if (!graph.getVertices().contains(destination)) {
+            System.out.println("Destination airport " + destination + " does not exist.");
+        } else {
+            graph.removeEdge(source, destination);
+            System.out.println("Flight removed from " + source + " to " + destination);
+        }
         
         pauseScreen(2000);
     }
 
     public void loginUser() {
-        clearScreen();
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter username (or Staff ID): ");
+        System.out.print("Enter username or staff ID: ");
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
         
         login(username, password);
+    }
+
+    public void createNewStaff() {
+        clearScreen();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter new staff ID: ");
+        String staffId = scanner.nextLine();
+        System.out.print("Enter password for new staff: ");
+        String password = scanner.nextLine();
+        
+        if (staffId.isEmpty() || password.isEmpty()) {
+            System.out.println("Staff ID and password cannot be empty.");
+        } else if (staff.containsKey(staffId)) {
+            System.out.println("Staff ID already exists.");
+        } else {
+            addStaff(new Staff(staffId, password));
+            System.out.println("New staff created with ID: " + staffId);
+        }
+        
+        pauseScreen(2000);
     }
 
     public static void printDashes() {
@@ -289,26 +321,44 @@ public class AirlineSystem {
         String[] airports = {
             "KUL", "SIN", "BKK", "HKG", "NRT", "PEK", "SYD", "MEL", "LAX", "JFK",
             "LHR", "CDG", "AMS", "FRA", "DXB", "DOH", "ICN", "IST", "BCN", "MAD",
-            "FCO", "VIE", "ZRH", "CPT", "JNB", "GRU", "EZE", "YYZ", "YVR", "SFO" 
+            "FCO", "VIE", "ZRH", "CPT", "JNB", "GRU", "EZE", "YYZ", "YVR", "SFO"
         };
 
         for (String airport : airports) {
             graph.addVertex(airport);
         }
 
-        // Add some edges to connect the airports
-        String[][] edges = {
-            {"KUL", "SIN"}, {"KUL", "BKK"}, {"SIN", "HKG"}, {"HKG", "NRT"}, {"NRT", "PEK"},
-            {"PEK", "SYD"}, {"SYD", "MEL"}, {"MEL", "LAX"}, {"LAX", "JFK"}, {"JFK", "LHR"},
-            {"LHR", "CDG"}, {"CDG", "AMS"}, {"AMS", "FRA"}, {"FRA", "DXB"}, {"DXB", "DOH"},
-            {"DOH", "ICN"}, {"ICN", "IST"}, {"IST", "BCN"}, {"BCN", "MAD"}, {"MAD", "FCO"},
-            {"FCO", "VIE"}, {"VIE", "ZRH"}, {"ZRH", "CPT"}, {"CPT", "JNB"}, {"JNB", "GRU"},
-            {"GRU", "EZE"}, {"EZE", "YYZ"}, {"YYZ", "YVR"}, {"YVR", "SFO"}, {"SFO", "KUL"}
-        };
-
-        for (String[] edge : edges) {
-            graph.addEdge(edge[0], edge[1]);
-        }
+        // Add default connections
+        graph.addEdge("KUL", "SIN");
+        graph.addEdge("KUL", "BKK");
+        graph.addEdge("SIN", "HKG");
+        graph.addEdge("BKK", "NRT");
+        graph.addEdge("HKG", "PEK");
+        graph.addEdge("NRT", "SYD");
+        graph.addEdge("PEK", "MEL");
+        graph.addEdge("SYD", "LAX");
+        graph.addEdge("MEL", "JFK");
+        graph.addEdge("LAX", "LHR");
+        graph.addEdge("JFK", "CDG");
+        graph.addEdge("LHR", "AMS");
+        graph.addEdge("CDG", "FRA");
+        graph.addEdge("AMS", "DXB");
+        graph.addEdge("FRA", "DOH");
+        graph.addEdge("DXB", "ICN");
+        graph.addEdge("DOH", "IST");
+        graph.addEdge("ICN", "BCN");
+        graph.addEdge("IST", "MAD");
+        graph.addEdge("BCN", "FCO");
+        graph.addEdge("MAD", "VIE");
+        graph.addEdge("FCO", "ZRH");
+        graph.addEdge("VIE", "CPT");
+        graph.addEdge("ZRH", "JNB");
+        graph.addEdge("CPT", "GRU");
+        graph.addEdge("JNB", "EZE");
+        graph.addEdge("GRU", "YYZ");
+        graph.addEdge("EZE", "YVR");
+        graph.addEdge("YYZ", "SFO");
+        graph.addEdge("YVR", "KUL");
     }
 
     public static void main(String[] args) {

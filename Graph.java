@@ -54,28 +54,13 @@ public class Graph {
     }
 
     public void printGraphAsDiagram() {
-        System.out.println("AirAsia Flight Network (Graph View):");
-        Map<String, Integer> vertexIndices = new HashMap<>();
-        int index = 0;
-
-        // Assign an index to each vertex
         for (String vertex : adjacencyList.keySet()) {
-            vertexIndices.put(vertex, index++);
-        }
-
-        // Display the vertices with their indices
-        for (String vertex : adjacencyList.keySet()) {
-            System.out.printf("%2d: %s\n", vertexIndices.get(vertex), vertex);
-        }
-
-        System.out.println("\nConnections:");
-        // Display the edges
-        for (String vertex : adjacencyList.keySet()) {
-            int vertexIndex = vertexIndices.get(vertex);
+            System.out.print(vertex + " -> ");
             List<String> edges = adjacencyList.get(vertex);
             for (String edge : edges) {
-                System.out.printf("%2d -> %2d\n", vertexIndex, vertexIndices.get(edge));
+                System.out.print(edge + " ");
             }
+            System.out.println("\n");
         }
     }
 }
