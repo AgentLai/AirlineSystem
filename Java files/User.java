@@ -1,4 +1,4 @@
-public class User {
+public abstract class User {
     private String username;
     private String password;
 
@@ -11,7 +11,7 @@ public class User {
         return username;
     }
 
-    public boolean authenticate(String password) {
-        return this.password.equals(password);
+    public String getRole() {
+        return this instanceof Admin ? "Admin" : "Staff";
     }
 }

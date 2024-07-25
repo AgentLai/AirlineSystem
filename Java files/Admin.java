@@ -5,6 +5,7 @@ public class Admin extends User {
     }
 
     public void createStaff(String staffID, String password, AirlineSystem system) {
-        system.addStaff(new Staff(staffID, password));
+        Staff newStaff = new Staff(staffID, password);
+        system.addStaff(newStaff);
     }
 }

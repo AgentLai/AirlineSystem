@@ -1,84 +1,65 @@
 import java.util.*;
 
 public class Graph {
-    private Map<String, List<String>> adjacencyList = new HashMap<>();
+    private Map<String, List<String>> adjacencyList;
 
-    public void addVertex(String vertex) {
-        if (!adjacencyList.containsKey(vertex)) {
-            adjacencyList.put(vertex, new ArrayList<>());
-        }
+    public Graph() {
+        adjacencyList = new HashMap<>();
     }
 
-    public void addEdge(String source, String destination) {
-        if (adjacencyList.containsKey(source) && adjacencyList.containsKey(destination)) {
-            adjacencyList.get(source).add(destination);
-        }
+    public void addVertex(String vertex) {
+        adjacencyList.putIfAbsent(vertex, new ArrayList<>());
     }
 
     public void removeVertex(String vertex) {
+        adjacencyList.values().forEach(e -> e.remove(vertex));
         adjacencyList.remove(vertex);
-        for (List<String> edges : adjacencyList.values()) {
-            edges.remove(vertex);
-        }
     }
 
-    public void removeEdge(String source, String destination) {
-        if (adjacencyList.containsKey(source)) {
-            adjacencyList.get(source).remove(destination);
-        }
+    public void addEdge(String vertex1, String vertex2) {
+        adjacencyList.get(vertex1).add(vertex2);
+        adjacencyList.get(vertex2).add(vertex1);
     }
 
-    public Set<String> getVertices() {
-        return adjacencyList.keySet();
+    public void removeEdge(String vertex1, String vertex2) {
+        List<String> edgesVertex1 = adjacencyList.get(vertex1);
+        List<String> edgesVertex2 = adjacencyList.get(vertex2);
+        if (edgesVertex1 != null) edgesVertex1.remove(vertex2);
+        if (edgesVertex2 != null) edgesVertex2.remove(vertex1);
+    }
+
+    public List<String> getVertices() {
+        return new ArrayList<>(adjacencyList.keySet());
+    }
+
+    public List<String> getEdges(String vertex) {
+        return adjacencyList.get(vertex);
     }
 
     public List<String> dfsTraversal(String startVertex) {
-        List<String> visited = new ArrayList<>();
+        List<String> visitedVertices = new ArrayList<>();
         Stack<String> stack = new Stack<>();
+        Set<String> visited = new HashSet<>();
+
         stack.push(startVertex);
 
         while (!stack.isEmpty()) {
             String vertex = stack.pop();
             if (!visited.contains(vertex)) {
                 visited.add(vertex);
-                for (String neighbor : adjacencyList.get(vertex)) {
-                    if (!visited.contains(neighbor)) {
-                        stack.push(neighbor);
+                visitedVertices.add(vertex);
+
+                List<String> neighbours = adjacencyList.get(vertex);
+                if (neighbours != null) {
+                    for (String neighbour : neighbours) {
+                        if (!visited.contains(neighbour)) {
+                            stack.push(neighbour);
+                        }
                     }
                 }
             }
         }
 
-        return visited;
-    }
-
-    public List<String> bfsTraversal(String startVertex) {
-        List<String> visited = new ArrayList<>();
-        Queue<String> queue = new LinkedList<>();
-        queue.add(startVertex);
-
-        while (!queue.isEmpty()) {
-            String vertex = queue.poll();
-            if (!visited.contains(vertex)) {
-                visited.add(vertex);
-                for (String neighbor : adjacencyList.get(vertex)) {
-                    if (!visited.contains(neighbor)) {
-                        queue.add(neighbor);
-                    }
-                }
-            }
-        }
-
-        return visited;
-    }
-
-    public void printGraphAsDiagram() {
-        for (String vertex : adjacencyList.keySet()) {
-            System.out.print(vertex + ": ");
-            for (String edge : adjacencyList.get(vertex)) {
-                System.out.print(edge + " ");
-            }
-            System.out.println("\n");
-        }
+        return visitedVertices;
     }
 }
