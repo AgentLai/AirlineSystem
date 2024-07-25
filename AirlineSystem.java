@@ -1,5 +1,4 @@
 import java.util.*;
-import java.io.IOException;
 
 public class AirlineSystem {
     private Graph graph = new Graph();
@@ -54,8 +53,10 @@ public class AirlineSystem {
             System.out.println("2 Create Graph");
             System.out.println("3 Search for an airport");
             System.out.println("4 " + (loggedInUser == null ? "Login" : "Logout"));
+            System.out.println("5 DFS Traversal");
+            System.out.println("6 BFS Traversal");
             if (loggedInUser instanceof Admin) {
-                System.out.println("5 Create new Staff");
+                System.out.println("7 Create new Staff");
             }
             System.out.println("0 Exit Program");
             System.out.print("Selection: ");
@@ -102,6 +103,12 @@ public class AirlineSystem {
                 }
                 break;
             case 5:
+                performDFSTraversal();
+                break;
+            case 6:
+                performBFSTraversal();
+                break;
+            case 7:
                 if (loggedInUser instanceof Admin) {
                     createNewStaff();
                 } else {
@@ -133,8 +140,10 @@ public class AirlineSystem {
         printDashes();
         System.out.println("1 Add Vertex");
         System.out.println("2 Add Edge");
-        System.out.println("3 Remove Vertex");
-        System.out.println("4 Remove Edge");
+        if (loggedInUser instanceof Admin) {
+            System.out.println("3 Remove Vertex");
+            System.out.println("4 Remove Edge");
+        }
         System.out.println("0 Exit Graph Creation");
         System.out.print("Selection: ");
         
@@ -155,10 +164,20 @@ public class AirlineSystem {
                 addEdge();
                 break;
             case 3:
-                removeVertex();
+                if (loggedInUser instanceof Admin) {
+                    removeVertex();
+                } else {
+                    System.out.println("You do not have permission to perform this action.");
+                    pauseScreen(2000);
+                }
                 break;
             case 4:
-                removeEdge();
+                if (loggedInUser instanceof Admin) {
+                    removeEdge();
+                } else {
+                    System.out.println("You do not have permission to perform this action.");
+                    pauseScreen(2000);
+                }
                 break;
             case 0:
                 System.out.println("Returning to main menu...");
@@ -178,11 +197,13 @@ public class AirlineSystem {
         
         if (graph.getVertices().contains(airport)) {
             System.out.println("Airport " + airport + " is in the network.");
+            System.out.println("Flight path from " + airport + ": " + graph.dfsTraversal(airport));
         } else {
             System.out.println("Airport " + airport + " is not in the network.");
         }
         
-        pauseScreen(2000);
+        System.out.println("\nPress Enter to return to the main menu...");
+        scanner.nextLine(); // Wait for user input
     }
 
     public void addVertex() {
@@ -215,7 +236,7 @@ public class AirlineSystem {
             System.out.println("Destination airport " + destination + " does not exist.");
         } else {
             graph.addEdge(source, destination);
-            System.out.println("Flight added from " + source + " to " + destination);
+            System.out.println("Edge from " + source + " to " + destination + " added.");
         }
         
         pauseScreen(2000);
@@ -224,11 +245,11 @@ public class AirlineSystem {
     public void removeVertex() {
         clearScreen();
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter the airport to remove: ");
+        System.out.print("Enter the name of the airport to remove: ");
         String vertex = scanner.nextLine();
         
         if (!graph.getVertices().contains(vertex)) {
-            System.out.println("Airport " + vertex + " does not exist.");
+            System.out.println("Airport " + vertex " does not exist.");
         } else {
             graph.removeVertex(vertex);
             System.out.println("Airport " + vertex + " removed.");
@@ -251,50 +272,81 @@ public class AirlineSystem {
             System.out.println("Destination airport " + destination + " does not exist.");
         } else {
             graph.removeEdge(source, destination);
-            System.out.println("Flight removed from " + source + " to " + destination);
+            System.out.println("Edge from " + source + " to " + destination + " removed.");
         }
         
         pauseScreen(2000);
     }
 
     public void loginUser() {
+        clearScreen();
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter username or staff ID: ");
+        System.out.print("Enter username: ");
         String username = scanner.nextLine();
         System.out.print("Enter password: ");
         String password = scanner.nextLine();
-        
         login(username, password);
     }
 
     public void createNewStaff() {
         clearScreen();
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Enter new staff ID: ");
-        String staffId = scanner.nextLine();
-        System.out.print("Enter password for new staff: ");
+        System.out.print("Enter staff ID: ");
+        String staffID = scanner.nextLine();
+        System.out.print("Enter password: ");
         String password = scanner.nextLine();
         
-        if (staffId.isEmpty() || password.isEmpty()) {
+        if (staffID.isEmpty() || password.isEmpty()) {
             System.out.println("Staff ID and password cannot be empty.");
-        } else if (staff.containsKey(staffId)) {
-            System.out.println("Staff ID already exists.");
+        } else if (staff.containsKey(staffID)) {
+            System.out.println("Staff ID " + staffID + " already exists.");
         } else {
-            addStaff(new Staff(staffId, password));
-            System.out.println("New staff created with ID: " + staffId);
+            addStaff(new Staff(staffID, password));
+            System.out.println("New staff created with ID: " + staffID);
         }
         
         pauseScreen(2000);
     }
 
-    public static void printDashes() {
-        for (int i = 0; i < 30; i++) {
-            System.out.print("-");
+    public void performDFSTraversal() {
+        clearScreen();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the starting airport for DFS: ");
+        String startVertex = scanner.nextLine();
+        
+        if (!graph.getVertices().contains(startVertex)) {
+            System.out.println("Starting airport " + startVertex + " does not exist.");
+        } else {
+            List<String> traversalResult = graph.dfsTraversal(startVertex);
+            System.out.println("DFS Traversal from " + startVertex + ": " + traversalResult);
         }
-        System.out.println();
+        
+        System.out.println("\nPress Enter to return to the main menu...");
+        scanner.nextLine(); // Wait for user input
     }
 
-    public static void clearScreen() {
+    public void performBFSTraversal() {
+        clearScreen();
+        Scanner scanner = new Scanner(System.in);
+        System.out.print("Enter the starting airport for BFS: ");
+        String startVertex = scanner.nextLine();
+        
+        if (!graph.getVertices().contains(startVertex)) {
+            System.out.println("Starting airport " + startVertex + " does not exist.");
+        } else {
+            List<String> traversalResult = graph.bfsTraversal(startVertex);
+            System.out.println("BFS Traversal from " + startVertex + ": " + traversalResult);
+        }
+        
+        System.out.println("\nPress Enter to return to the main menu...");
+        scanner.nextLine(); // Wait for user input
+    }
+
+    public void printDashes() {
+        System.out.println("-----------------------------------------");
+    }
+
+    public void clearScreen() {
         try {
             if (System.getProperty("os.name").contains("Windows")) {
                 new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
