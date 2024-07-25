@@ -1,65 +1,86 @@
 import java.util.*;
 
 public class Graph {
-    private Map<String, List<String>> adjacencyList;
-
-    public Graph() {
-        adjacencyList = new HashMap<>();
+    private Map<String, List<String>> adjVertices = new HashMap<>();
+    private Map<String, String> airportCities = new HashMap<>();
+    
+    public void addVertex(String code, String city) {
+        adjVertices.putIfAbsent(code, new ArrayList<>());
+        airportCities.putIfAbsent(code, city);
     }
 
-    public void addVertex(String vertex) {
-        adjacencyList.putIfAbsent(vertex, new ArrayList<>());
+    public void addEdge(String source, String destination) {
+        adjVertices.get(source).add(destination);
+        adjVertices.get(destination).add(source); // Since it's an undirected graph
     }
 
-    public void removeVertex(String vertex) {
-        adjacencyList.values().forEach(e -> e.remove(vertex));
-        adjacencyList.remove(vertex);
+    public void removeVertex(String code) {
+        adjVertices.values().forEach(e -> e.remove(code));
+        adjVertices.remove(code);
+        airportCities.remove(code);
     }
 
-    public void addEdge(String vertex1, String vertex2) {
-        adjacencyList.get(vertex1).add(vertex2);
-        adjacencyList.get(vertex2).add(vertex1);
+    public void removeEdge(String source, String destination) {
+        List<String> srcEdges = adjVertices.get(source);
+        List<String> destEdges = adjVertices.get(destination);
+        if (srcEdges != null) srcEdges.remove(destination);
+        if (destEdges != null) destEdges.remove(source);
     }
 
-    public void removeEdge(String vertex1, String vertex2) {
-        List<String> edgesVertex1 = adjacencyList.get(vertex1);
-        List<String> edgesVertex2 = adjacencyList.get(vertex2);
-        if (edgesVertex1 != null) edgesVertex1.remove(vertex2);
-        if (edgesVertex2 != null) edgesVertex2.remove(vertex1);
+    public List<String> getEdges(String code) {
+        return adjVertices.getOrDefault(code, new ArrayList<>());
     }
 
-    public List<String> getVertices() {
-        return new ArrayList<>(adjacencyList.keySet());
+    public Set<String> getVertices() {
+        return adjVertices.keySet();
     }
 
-    public List<String> getEdges(String vertex) {
-        return adjacencyList.get(vertex);
+    public String getCityName(String code) {
+        return airportCities.get(code);
     }
 
-    public List<String> dfsTraversal(String startVertex) {
-        List<String> visitedVertices = new ArrayList<>();
-        Stack<String> stack = new Stack<>();
+    public List<String> dfs(String start) {
+        List<String> result = new ArrayList<>();
         Set<String> visited = new HashSet<>();
+        dfsRecursive(start, visited, result);
+        return result;
+    }
 
-        stack.push(startVertex);
+    private void dfsRecursive(String vertex, Set<String> visited, List<String> result) {
+        if (visited.contains(vertex)) return;
+        visited.add(vertex);
+        result.add(vertex);
+        for (String neighbor : adjVertices.getOrDefault(vertex, new ArrayList<>())) {
+            dfsRecursive(neighbor, visited, result);
+        }
+    }
 
-        while (!stack.isEmpty()) {
-            String vertex = stack.pop();
-            if (!visited.contains(vertex)) {
-                visited.add(vertex);
-                visitedVertices.add(vertex);
-
-                List<String> neighbours = adjacencyList.get(vertex);
-                if (neighbours != null) {
-                    for (String neighbour : neighbours) {
-                        if (!visited.contains(neighbour)) {
-                            stack.push(neighbour);
-                        }
-                    }
+    public List<String> bfs(String start) {
+        List<String> result = new ArrayList<>();
+        Set<String> visited = new HashSet<>();
+        Queue<String> queue = new LinkedList<>();
+        queue.add(start);
+        visited.add(start);
+    
+        while (!queue.isEmpty()) {
+            String vertex = queue.poll();
+            result.add(vertex);
+            for (String neighbor : adjVertices.getOrDefault(vertex, new ArrayList<>())) {
+                if (!visited.contains(neighbor)) {
+                    visited.add(neighbor);
+                    queue.add(neighbor);
                 }
             }
         }
-
-        return visitedVertices;
+        return result;
     }
+
+    public void displayFlightPath(String start) {
+        List<String> path = bfs(start); 
+        System.out.println("Flight Path from " + start + ":");
+        for (String airport : path) {
+            System.out.println(airport + " - " + airportCities.get(airport));
+        }
+    }
+    
 }

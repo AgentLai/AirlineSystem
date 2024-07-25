@@ -1,10 +1,6 @@
 Default admin access
 Username: Admin
-Password: AirAsiaAdmin2024
-
-Default staff access
-Staff ID: F001
-Password: AirAsia2024
+Password: Admin123
 
 30 default airports
 "KUL", "SIN", "BKK", "HKG", "NRT", "PEK", "SYD", "MEL", "LAX", "JFK",
