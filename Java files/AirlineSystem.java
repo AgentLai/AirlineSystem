@@ -169,9 +169,10 @@ public class AirlineSystem {
         printDashes();
         System.out.println("1. Depth First Search (DFS)");
         System.out.println("2. Breadth First Search (BFS)");
+        System.out.println("3. Find Shortest Path");
         System.out.println("0. Return to Main Menu");
         System.out.print("Selection: ");
-    
+        
         int userInput = getIntInput();
         switch (userInput) {
             case 1:
@@ -180,6 +181,9 @@ public class AirlineSystem {
             case 2:
                 bfsTraversal();
                 break;
+            case 3:
+                findShortestPath();
+                break;
             case 0:
                 System.out.println("Returning to main menu...");
                 break;
@@ -187,6 +191,96 @@ public class AirlineSystem {
                 System.out.println("Invalid selection. Please try again.");
         }
         pauseScreen(1000);
+    }
+    
+    public static void findShortestPath() {
+        clearScreen();
+        printDashes();
+        System.out.println("Find Shortest Path");
+        printDashes();
+        
+        // Display all airports in ascending order
+        List<String> sortedVertices = new ArrayList<>(graph.getVertices());
+        Collections.sort(sortedVertices);
+        
+        System.out.println("Available Airports:");
+        for (String vertex : sortedVertices) {
+            System.out.println(vertex + " - " + graph.getCityName(vertex));
+        }
+        printDashes();
+        
+        System.out.print("Enter starting airport code: ");
+        String start = scanner.nextLine().toUpperCase();
+        System.out.print("Enter destination airport code: ");
+        String end = scanner.nextLine().toUpperCase();
+        
+        // Clear screen before showing the result
+        clearScreen();
+        
+        System.out.println("Shortest path from " + start + " (" + graph.getCityName(start) + ") to " + end + " (" + graph.getCityName(end) + "):");
+        
+        List<String> path = findShortestPathBFS(start, end);
+        printDashes();
+
+        if (path != null) {
+            // Display airport codes
+            for (int i = 0; i < path.size(); i++) {
+                System.out.print(path.get(i));
+                if (i < path.size() - 1) {
+                    System.out.print(" --> ");
+                }
+            }
+            System.out.println();
+            
+            // Display airport city names
+            for (int i = 0; i < path.size(); i++) {
+                System.out.print(graph.getCityName(path.get(i)));
+                if (i < path.size() - 1) {
+                    System.out.print(" --> ");
+                }
+            }
+            System.out.println();
+        } else {
+            System.out.println("No path found from " + start + " to " + end);
+        }
+
+        printDashes();
+        System.out.println("Press Enter to return.");
+        scanner.nextLine();
+    }
+    
+    
+    public static List<String> findShortestPathBFS(String start, String end) {
+        Map<String, String> prev = new HashMap<>();
+        Queue<String> queue = new LinkedList<>();
+        Set<String> visited = new HashSet<>();
+        
+        queue.add(start);
+        visited.add(start);
+        
+        while (!queue.isEmpty()) {
+            String current = queue.poll();
+            
+            if (current.equals(end)) {
+                // Build the path by following the `prev` map
+                List<String> path = new ArrayList<>();
+                for (String at = end; at != null; at = prev.get(at)) {
+                    path.add(at);
+                }
+                Collections.reverse(path);
+                return path;
+            }
+            
+            for (String neighbor : graph.getEdges(current)) {
+                if (!visited.contains(neighbor)) {
+                    queue.add(neighbor);
+                    visited.add(neighbor);
+                    prev.put(neighbor, current);
+                }
+            }
+        }
+        
+        return null; // No path found
     }
     
 
@@ -210,6 +304,7 @@ public class AirlineSystem {
             }
         }
         
+        printDashes();
         System.out.println("Flight Connections:");
         printDashes();
         
@@ -374,7 +469,7 @@ public class AirlineSystem {
     printDashes();
     System.out.println("Press Enter to exit.");
     scanner.nextLine(); // Wait for user input to exit
-}
+    }
 
     public static Set<String> bfs(String start) {
         Set<String> visited = new HashSet<>();
@@ -396,6 +491,7 @@ public class AirlineSystem {
         return visited;
     }
 
+
     
 
     public static void dfsTraversal() {
@@ -403,49 +499,72 @@ public class AirlineSystem {
         printDashes();
         System.out.println("Depth First Search (DFS)");
         printDashes();
-    
+
         System.out.print("Enter starting airport code: ");
         String startCode = scanner.nextLine();
         List<String> result = graph.dfs(startCode);
+
+        clearScreen();
         System.out.println("DFS result:");
+        printDashes();
+
         for (String airport : result) {
             System.out.println(airport + " - " + graph.getCityName(airport));
         }
+        printDashes();
         System.out.println("Press Enter to return.");
         scanner.nextLine();
     }
-    
+
+        
     public static void bfsTraversal() {
         clearScreen();
         printDashes();
         System.out.println("Breadth First Search (BFS)");
         printDashes();
-    
+
         System.out.print("Enter starting airport code: ");
         String startCode = scanner.nextLine();
-        List<String> result = graph.bfs(startCode); 
+        List<String> result = graph.bfs(startCode);
+
+        clearScreen();
         System.out.println("BFS result:");
+        printDashes();
+
         for (String airport : result) {
             System.out.println(airport + " - " + graph.getCityName(airport));
         }
+        printDashes();
         System.out.println("Press Enter to return.");
         scanner.nextLine();
     }
+
     
 
-    public static void createNewStaff() {
-        clearScreen(); 
-        System.out.println("Create New Staff");
-        printDashes();
-        System.out.print("Enter new staff username: ");
+public static void createNewStaff() {
+    clearScreen(); 
+    System.out.println("Create New Staff");
+    printDashes();
+
+    while (true) {
+        System.out.print("Enter new staff username (or enter 0 to cancel): ");
         String username = scanner.nextLine();
+        if (username.equals("0")) {
+            System.out.println("Staff creation cancelled.");
+            break;
+        }
+
         System.out.print("Enter new staff password: ");
         String password = scanner.nextLine();
+        
         staffList.add(new Staff(username, password));
-        System.out.println("Staff created.");
+        System.out.println("Staff created successfully.");
         pauseScreen(1000);  
         clearScreen();  
+        break; // Exit loop after successful creation
     }
+}
+
     
     
     public static void login() {
