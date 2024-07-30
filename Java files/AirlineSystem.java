@@ -114,7 +114,6 @@ public class AirlineSystem {
         return getIntInput();
     }
     
-    
     public static void handleUserInput(int userInput) {
         switch (userInput) {
             case 1:
@@ -124,7 +123,6 @@ public class AirlineSystem {
                 searchAirport();
                 break;
             case 3:
-                clearScreen();  // Clear screen before login or graph creation
                 if (loggedInUser != null && (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Staff"))) {
                     createGraph();
                 } else {
@@ -137,7 +135,6 @@ public class AirlineSystem {
                 } else {
                     login();
                 }
-                clearScreen();  // Clear screen after login
                 break;
             case 5:
                 if (loggedInUser != null && loggedInUser.getRole().equals("Admin")) {
@@ -249,7 +246,6 @@ public class AirlineSystem {
         scanner.nextLine();
     }
     
-    
     public static List<String> findShortestPathBFS(String start, String end) {
         Map<String, String> prev = new HashMap<>();
         Queue<String> queue = new LinkedList<>();
@@ -282,7 +278,6 @@ public class AirlineSystem {
         
         return null; // No path found
     }
-    
 
     public static void viewFlightNetwork() {
         clearScreen();
@@ -322,9 +317,7 @@ public class AirlineSystem {
         System.out.println("Press Enter to exit.");
         scanner.nextLine(); 
     }
-    
-    
-    
+
     public static void createGraph() {
         clearScreen();  
         int graphInput;
@@ -335,8 +328,7 @@ public class AirlineSystem {
             }
         } while (graphInput != 0);
         clearScreen();  
-    }
-    
+    }   
 
     public static int graphMenu() {
         clearScreen();
@@ -389,7 +381,7 @@ public class AirlineSystem {
     
     public static void addAirport() {
         System.out.print("Enter airport code: ");
-        String code = scanner.nextLine();
+        String code = scanner.nextLine().toUpperCase();
         System.out.print("Enter airport city: ");
         String city = scanner.nextLine();
         graph.addVertex(code, city);
@@ -398,9 +390,9 @@ public class AirlineSystem {
     
     public static void addConnection() {
         System.out.print("Enter source airport code: ");
-        String source = scanner.nextLine();
+        String source = scanner.nextLine().toUpperCase();
         System.out.print("Enter destination airport code: ");
-        String destination = scanner.nextLine();
+        String destination = scanner.nextLine().toUpperCase();
         graph.addEdge(source, destination);
         System.out.println("Connection added.");
     }
@@ -422,53 +414,53 @@ public class AirlineSystem {
     }
 
     public static void searchAirport() {
-    clearScreen();
-    printDashes();
-    System.out.println("Search for an Airport");
-    printDashes();
-    
-    System.out.print("Enter airport code to search: ");
-    String code = scanner.nextLine();
-    
-    String city = graph.getCityName(code);
-    if (city != null) {
-        System.out.println("Airport Code: " + code);
-        System.out.println("City: " + city);
-        printDashes();
-        
-        // Display direct flight path
-        System.out.println("Direct Flight Path from " + code + ":");
-        List<String> directFlights = graph.getEdges(code);
-        if (directFlights.isEmpty()) {
-            System.out.println("NONE");
-        } else {
-            for (String destination : directFlights) {
-                System.out.println(destination + " - " + graph.getCityName(destination));
-            }
-        }
-        printDashes();
-        
-        // Find unreachable locations using BFS
-        System.out.println("Unreachable locations from " + code + ":");
-        Set<String> reachable = bfs(code);
-        List<String> allAirports = new ArrayList<>(graph.getVertices());
-        allAirports.remove(code); // Remove the current airport from the list of unreachable locations
-        allAirports.removeAll(reachable);
-        
-        if (allAirports.isEmpty()) {
-            System.out.println("NONE");
-        } else {
-            for (String airport : allAirports) {
-                System.out.println(airport + " - " + graph.getCityName(airport));
-            }
-        }
-    } else {
-        System.out.println("Airport not found.");
-    }
-    
-    printDashes();
-    System.out.println("Press Enter to exit.");
-    scanner.nextLine(); // Wait for user input to exit
+	    clearScreen();
+	    printDashes();
+	    System.out.println("Search for an Airport");
+	    printDashes();
+	    
+	    System.out.print("Enter airport code to search: ");
+	    String code = scanner.nextLine().toUpperCase();
+	    
+	    String city = graph.getCityName(code);
+	    if (city != null) {
+	        System.out.println("Airport Code: " + code);
+	        System.out.println("City: " + city);
+	        printDashes();
+	        
+	        // Display direct flight path
+	        System.out.println("Direct Flight Path from " + code + ":");
+	        List<String> directFlights = graph.getEdges(code);
+	        if (directFlights.isEmpty()) {
+	            System.out.println("NONE");
+	        } else {
+	            for (String destination : directFlights) {
+	                System.out.println(destination + " - " + graph.getCityName(destination));
+	            }
+	        }
+	        printDashes();
+	        
+	        // Find unreachable locations using BFS
+	        System.out.println("Unreachable locations from " + code + ":");
+	        Set<String> reachable = bfs(code);
+	        List<String> allAirports = new ArrayList<>(graph.getVertices());
+	        allAirports.remove(code); // Remove the current airport from the list of unreachable locations
+	        allAirports.removeAll(reachable);
+	        
+	        if (allAirports.isEmpty()) {
+	            System.out.println("NONE");
+	        } else {
+	            for (String airport : allAirports) {
+	                System.out.println(airport + " - " + graph.getCityName(airport));
+	            }
+	        }
+	    } else {
+	        System.out.println("Airport not found.");
+	    }
+	    
+	    printDashes();
+	    System.out.println("Press Enter to exit.");
+	    scanner.nextLine(); // Wait for user input to exit
     }
 
     public static Set<String> bfs(String start) {
@@ -491,9 +483,6 @@ public class AirlineSystem {
         return visited;
     }
 
-
-    
-
     public static void dfsTraversal() {
         clearScreen();
         printDashes();
@@ -501,7 +490,7 @@ public class AirlineSystem {
         printDashes();
 
         System.out.print("Enter starting airport code: ");
-        String startCode = scanner.nextLine();
+        String startCode = scanner.nextLine().toUpperCase();
         List<String> result = graph.dfs(startCode);
 
         clearScreen();
@@ -515,7 +504,6 @@ public class AirlineSystem {
         System.out.println("Press Enter to return.");
         scanner.nextLine();
     }
-
         
     public static void bfsTraversal() {
         clearScreen();
@@ -524,7 +512,7 @@ public class AirlineSystem {
         printDashes();
 
         System.out.print("Enter starting airport code: ");
-        String startCode = scanner.nextLine();
+        String startCode = scanner.nextLine().toUpperCase();
         List<String> result = graph.bfs(startCode);
 
         clearScreen();
@@ -534,39 +522,36 @@ public class AirlineSystem {
         for (String airport : result) {
             System.out.println(airport + " - " + graph.getCityName(airport));
         }
+        
         printDashes();
         System.out.println("Press Enter to return.");
         scanner.nextLine();
     }
 
-    
-
-public static void createNewStaff() {
-    clearScreen(); 
-    System.out.println("Create New Staff");
-    printDashes();
-
-    while (true) {
-        System.out.print("Enter new staff username (or enter 0 to cancel): ");
-        String username = scanner.nextLine();
-        if (username.equals("0")) {
-            System.out.println("Staff creation cancelled.");
-            break;
-        }
-
-        System.out.print("Enter new staff password: ");
-        String password = scanner.nextLine();
-        
-        staffList.add(new Staff(username, password));
-        System.out.println("Staff created successfully.");
-        pauseScreen(1000);  
-        clearScreen();  
-        break; // Exit loop after successful creation
-    }
-}
-
-    
-    
+	public static void createNewStaff() {
+	    clearScreen(); 
+	    System.out.println("Create New Staff");
+	    printDashes();
+	
+	    while (true) {
+	        System.out.print("Enter new staff username (or enter 0 to cancel): ");
+	        String username = scanner.nextLine();
+	        if (username.equals("0")) {
+	            System.out.println("Staff creation cancelled.");
+	            break;
+	        }
+	
+	        System.out.print("Enter new staff password: ");
+	        String password = scanner.nextLine();
+	        
+	        staffList.add(new Staff(username, password));
+	        System.out.println("Staff created successfully.");
+	        pauseScreen(1000);  
+	        clearScreen();  
+	        break; 
+	    }
+	}
+  
     public static void login() {
         clearScreen();  
         System.out.print("Enter username: ");
@@ -639,10 +624,10 @@ public static void createNewStaff() {
     public static int getIntInput() {
         while (!scanner.hasNextInt()) {
             System.out.println("Invalid input. Please enter a number.");
-            scanner.next(); // Clear invalid input
+            scanner.next(); 
         }
         int input = scanner.nextInt();
-        scanner.nextLine(); // Consume the newline character
+        scanner.nextLine(); 
         return input;
     }
     
