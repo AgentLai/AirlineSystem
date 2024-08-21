@@ -1,3 +1,5 @@
+import javafx.animation.PauseTransition;
+import javafx.util.Duration;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
@@ -552,14 +554,22 @@ public class AirlineSystem extends Application {
         List<String> path = graph.dfs(start);
         viewGraph(gc); // Refresh graph view
         graph.animateTraversal(gc, positions, path);
-        resetAirportHighlighting(gc);
+    
+        // Delay resetting the highlights by 3 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(event -> resetAirportHighlighting(gc));
+        pause.play();
     }
 
     private void bfsTraversal(GraphicsContext gc, String start) {
         List<String> path = graph.bfs(start);
         viewGraph(gc); // Refresh graph view
         graph.animateTraversal(gc, positions, path);
-        resetAirportHighlighting(gc);
+
+        // Delay resetting the highlights by 3 seconds
+        PauseTransition pause = new PauseTransition(Duration.seconds(3));
+        pause.setOnFinished(event -> resetAirportHighlighting(gc));
+        pause.play();
     }
 
     private void findShortestPath(GraphicsContext gc, String start, String end) {
@@ -569,7 +579,11 @@ public class AirlineSystem extends Application {
         } else {
             viewGraph(gc); // Refresh graph view
             graph.animateTraversal(gc, positions, path);
-            resetAirportHighlighting(gc);
+    
+            // Delay resetting the highlights by 3 seconds
+            PauseTransition pause = new PauseTransition(Duration.seconds(3));
+            pause.setOnFinished(event -> resetAirportHighlighting(gc));
+            pause.play();
         }
     }
 

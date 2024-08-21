@@ -6,20 +6,18 @@ Default staff credentials:
 Username: Staff
 Password: Staff123
 
-Step 1: Download and install JavaFx, Java JDK
-Step 2: 
+Prerequisites
+Java JDK: Ensure that Java JDK is installed on your system.
+JavaFX: Download and install JavaFX.
 
-Notes:
-- Please replace "REPLACE THIS WITH YOUR PATH TO JAVAFX LIB" with the actual path of your JavaFX/lib path.
+Setup Instructions
+Download and install Java JDK and JavaFX.
+Replace "REPLACE THIS WITH YOUR PATH TO JAVAFX LIB" with the actual path to your JavaFX lib directory in the commands provided below.
 
+To compile the code, open your terminal or command prompt and navigate to the directory containing the .java files. Use the following command to compile the project:
 
-How to compile the code:
 javac --module-path "REPLACE THIS WITH YOUR PATH TO JAVAFX LIB" --add-modules javafx.controls,javafx.fxml *.java
+------------------------------------------------------------------------------------------------------------------------------------------------
+Once compiled, you can run the application using the following command:
 
-How to run the application:
 java --module-path "REPLACE THIS WITH YOUR PATH TO JAVAFX LIB" --add-modules javafx.controls,javafx.fxml AirlineSystem
-
-
-TODO AT 12:
-- Fix algorithms
-- Create README 

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.jar</jar>
+  <outfile>D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.exe</outfile>
+  <errTitle></errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl></downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>false</restartOnCrash>
+  <manifest></manifest>
+  <icon>D:\Downloads\AirlineSystemIcon.ico</icon>
+  <classPath>
+    <mainClass>AirlineSystem</mainClass>
+    <cp>D:\Programming\Github\Repository\AirlineSystem\Java files</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.base</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.controls</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.fxml</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.graphics</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.media</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swing</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.web</cp>
+    <cp>D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx-swt</cp>
+  </classPath>
+  <jre>
+    <path>%JAVA_HOME%;%PATH%</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+    <opt>--module-path &quot;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib&quot; --add-modules javafx.controls,javafx.fxml</opt>
+  </jre>
+</launch4jConfig>

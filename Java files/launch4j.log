@@ -1,0 +1,89 @@
+
+
+Version:	3.50
+CmdLine:	D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\Programming\Github\Repository\AirlineSystem\Java files\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+Substitute:	JAVA_HOME = C:\Program Files\Java\jdk-21
+Substitute:	PATH = C:\Program Files\Common Files\Oracle\Java\javapath;F:\Programming\Oracle\app\oracle\product\11.2.0\server\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\dotnet\;F:\Programming\Tools\apache-maven-3.9.6\bin;C:\Program Files\Java\jdk1.8.0_271\bin;C:\Program Files\Java\jdk-21\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Programming\Git\Git\cmd;C:\Users\agent\AppData\Local\Microsoft\WindowsApps;F:\Programming\Tools\IntelliJ IDEA 2023.3.4\bin;;F:\Programming\Tools\heroku\bin;C:\Users\agent\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\agent\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-21\bin
+JRE paths:	C:\Program Files\Java\jdk-21;C:\Program Files\Common Files\Oracle\Java\javapath;F:\Programming\Oracle\app\oracle\product\11.2.0\server\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\dotnet\;F:\Programming\Tools\apache-maven-3.9.6\bin;C:\Program Files\Java\jdk1.8.0_271\bin;C:\Program Files\Java\jdk-21\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Programming\Git\Git\cmd;C:\Users\agent\AppData\Local\Microsoft\WindowsApps;F:\Programming\Tools\IntelliJ IDEA 2023.3.4\bin;;F:\Programming\Tools\heroku\bin;C:\Users\agent\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\agent\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-21\bin
+Check launcher:	C:\Program Files\Java\jdk-21\bin\javaw.exe (OK)
+Version string: 1.021.000_002 / 64-Bit (OK)
+Main class:	AirlineSystem
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.web
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swt
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.media
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swing
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.graphics
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.fxml
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.controls
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.base
+Launcher:	C:\Program Files\Java\jdk-21\bin\javaw.exe
+Launcher args:	-classpath "D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.exe;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.web;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swt;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.media;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swing;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.graphics;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.fxml;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.controls;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.base" AirlineSystem
+Args length:	1022/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\Programming\Github\Repository\AirlineSystem\Java files\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+Substitute:	JAVA_HOME = C:\Program Files\Java\jdk-21
+Substitute:	PATH = C:\Program Files\Common Files\Oracle\Java\javapath;F:\Programming\Oracle\app\oracle\product\11.2.0\server\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\dotnet\;F:\Programming\Tools\apache-maven-3.9.6\bin;C:\Program Files\Java\jdk1.8.0_271\bin;C:\Program Files\Java\jdk-21\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Programming\Git\Git\cmd;C:\Users\agent\AppData\Local\Microsoft\WindowsApps;F:\Programming\Tools\IntelliJ IDEA 2023.3.4\bin;;F:\Programming\Tools\heroku\bin;C:\Users\agent\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\agent\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-21\bin
+JRE paths:	C:\Program Files\Java\jdk-21;C:\Program Files\Common Files\Oracle\Java\javapath;F:\Programming\Oracle\app\oracle\product\11.2.0\server\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\dotnet\;F:\Programming\Tools\apache-maven-3.9.6\bin;C:\Program Files\Java\jdk1.8.0_271\bin;C:\Program Files\Java\jdk-21\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Programming\Git\Git\cmd;C:\Users\agent\AppData\Local\Microsoft\WindowsApps;F:\Programming\Tools\IntelliJ IDEA 2023.3.4\bin;;F:\Programming\Tools\heroku\bin;C:\Users\agent\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\agent\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-21\bin
+Check launcher:	C:\Program Files\Java\jdk-21\bin\javaw.exe (OK)
+Version string: 1.021.000_002 / 64-Bit (OK)
+Main class:	AirlineSystem
+Add classpath:	D:\Programming\Github\Repository\AirlineSystem\Java files
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.base
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.controls
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.fxml
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.graphics
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.media
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swing
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.web
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx-swt
+Launcher:	C:\Program Files\Java\jdk-21\bin\javaw.exe
+Launcher args:	-classpath "D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.exe;D:\Programming\Github\Repository\AirlineSystem\Java files;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.base;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.controls;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.fxml;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.graphics;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.media;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swing;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.web;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx-swt" AirlineSystem
+Args length:	1080/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\Programming\Github\Repository\AirlineSystem\Java files\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+Substitute:	JAVA_HOME = C:\Program Files\Java\jdk-21
+Substitute:	PATH = C:\Program Files\Common Files\Oracle\Java\javapath;F:\Programming\Oracle\app\oracle\product\11.2.0\server\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\dotnet\;F:\Programming\Tools\apache-maven-3.9.6\bin;C:\Program Files\Java\jdk1.8.0_271\bin;C:\Program Files\Java\jdk-21\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Programming\Git\Git\cmd;C:\Users\agent\AppData\Local\Microsoft\WindowsApps;F:\Programming\Tools\IntelliJ IDEA 2023.3.4\bin;;F:\Programming\Tools\heroku\bin;C:\Users\agent\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\agent\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-21\bin
+JRE paths:	C:\Program Files\Java\jdk-21;C:\Program Files\Common Files\Oracle\Java\javapath;F:\Programming\Oracle\app\oracle\product\11.2.0\server\bin;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\WINDOWS\system32;C:\WINDOWS;C:\WINDOWS\System32\Wbem;C:\WINDOWS\System32\WindowsPowerShell\v1.0\;C:\WINDOWS\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\150\Tools\Binn\;C:\Program Files\dotnet\;F:\Programming\Tools\apache-maven-3.9.6\bin;C:\Program Files\Java\jdk1.8.0_271\bin;C:\Program Files\Java\jdk-21\bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Windows Kits\10\Windows Performance Toolkit\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;D:\Programming\Git\Git\cmd;C:\Users\agent\AppData\Local\Microsoft\WindowsApps;F:\Programming\Tools\IntelliJ IDEA 2023.3.4\bin;;F:\Programming\Tools\heroku\bin;C:\Users\agent\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\agent\AppData\Local\GitHubDesktop\bin;C:\Program Files\Java\jdk-21\bin
+Check launcher:	C:\Program Files\Java\jdk-21\bin\javaw.exe (OK)
+Version string: 1.021.000_002 / 64-Bit (OK)
+Main class:	AirlineSystem
+Add classpath:	D:\Programming\Github\Repository\AirlineSystem\Java files
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.base
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.controls
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.fxml
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.graphics
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.media
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swing
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.web
+Add classpath:	D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx-swt
+Launcher:	C:\Program Files\Java\jdk-21\bin\javaw.exe
+Launcher args:	--module-path "D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib" --add-modules javafx.controls,javafx.fxml -classpath "D:\Programming\Github\Repository\AirlineSystem\Java files\AirlineSystem.exe;D:\Programming\Github\Repository\AirlineSystem\Java files;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.base;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.controls;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.fxml;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.graphics;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.media;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.swing;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx.web;D:\Programming\Tools\Random Programming Junk\openjfx-22.0.2_windows-x64_bin-sdk\javafx-sdk-22.0.2\lib\javafx-swt" AirlineSystem
+Args length:	1240/32768 chars
+Exit code:	0
