@@ -1,642 +1,583 @@
-import java.util.*;
-import java.io.IOException;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.PasswordField;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+import javafx.scene.text.Font;
+import javafx.scene.paint.Color;
 
-public class AirlineSystem {
-    private static Scanner scanner = new Scanner(System.in);
+import java.util.*;
+
+public class AirlineSystem extends Application {
     private static Graph graph = new Graph();
     private static User loggedInUser = null;
     private static List<Staff> staffList = new ArrayList<>();
     private static List<Admin> adminList = new ArrayList<>();
+    private Map<String, double[]> positions = new HashMap<>();
+    private Map<String, double[]> savedPositions = new HashMap<>();
+    private Canvas canvas;
+    private Stage mainStage;
+    private Label lblCurrentUser;
+    private TextField txtUsername;
+    private PasswordField txtPassword;
+    private Button btnLoginLogout;
+    private VBox loginBox;
+    private boolean airportMovementEnabled = false;
 
     public static void main(String[] args) {
         initializeGraph();
-        initializeAdmins();
-        int userInput;
-
-        do {
-            clearScreen();
-            displayLoggedInUser();
-            userInput = mainMenu();
-            handleUserInput(userInput);
-        } while (userInput != 0);
+        initializeUsers();
+        launch(args);
     }
 
-    public static void initializeGraph() {
-        String[][] airports = {
-            {"KUL", "Kuala Lumpur"}, {"SIN", "Singapore"}, {"BKK", "Bangkok"}, {"HKG", "Hong Kong"},
-            {"NRT", "Tokyo Narita"}, {"ICN", "Seoul Incheon"}, {"SYD", "Sydney"}, {"MEL", "Melbourne"},
-            {"PER", "Perth"}, {"ADL", "Adelaide"}, {"AKL", "Auckland"}, {"WLG", "Wellington"},
-            {"BNE", "Brisbane"}, {"CNS", "Cairns"}, {"DRW", "Darwin"}, {"HBA", "Hobart"},
-            {"CBR", "Canberra"}, {"OOL", "Gold Coast"}, {"NTL", "Newcastle"}, {"MKY", "Mackay"},
-            {"TSV", "Townsville"}, {"ROK", "Rockhampton"}, {"PPP", "Proserpine"}, {"HTI", "Hamilton Island"},
-            {"MOV", "Moranbah"}, {"ARM", "Armidale"}, {"GFF", "Griffith"}, {"PLO", "Port Lincoln"},
-            {"KGC", "Kingscote"}, {"MQL", "Mildura"}
-        };
-
-        for (String[] airport : airports) {
-            graph.addVertex(airport[0], airport[1]); // Pass both airport code and city name
-        }
-
-        // Add edges
-        graph.addEdge("KUL", "SIN");
-        graph.addEdge("KUL", "BKK");
-        graph.addEdge("SIN", "HKG");
-        graph.addEdge("BKK", "NRT");
-        graph.addEdge("HKG", "ICN");
-        graph.addEdge("NRT", "SYD");
-        graph.addEdge("ICN", "MEL");
-        graph.addEdge("SYD", "PER");
-        graph.addEdge("MEL", "ADL");
-        graph.addEdge("PER", "AKL");
-        graph.addEdge("ADL", "WLG");
-        graph.addEdge("AKL", "BNE");
-        graph.addEdge("WLG", "CNS");
-        graph.addEdge("BNE", "DRW");
-        graph.addEdge("CNS", "HBA");
-        graph.addEdge("DRW", "CBR");
-        graph.addEdge("HBA", "OOL");
-        graph.addEdge("CBR", "NTL");
-        graph.addEdge("OOL", "MKY");
-        graph.addEdge("NTL", "TSV");
-        graph.addEdge("MKY", "ROK");
-        graph.addEdge("TSV", "PPP");
-        graph.addEdge("ROK", "HTI");
-        graph.addEdge("PPP", "MOV");
-        graph.addEdge("HTI", "ARM");
-        graph.addEdge("MOV", "GFF");
-        graph.addEdge("ARM", "PLO");
-        graph.addEdge("GFF", "KGC");
-        graph.addEdge("PLO", "MQL");
-    } 
-
-    public static void initializeAdmins() {
-        adminList.add(new Admin("Admin", "Admin123"));
+    @Override
+    public void start(Stage primaryStage) {
+        mainStage = primaryStage;
+        canvas = new Canvas(800, 600);
+        GraphicsContext gc = canvas.getGraphicsContext2D();
+        viewGraph(gc);
+        showMainMenu(gc);
     }
 
-    public static void displayLoggedInUser() {
-        if (loggedInUser != null) {
-            System.out.println("Logged in as: " + loggedInUser.getUsername());
-            System.out.println("Role: " + loggedInUser.getRole());
-        } else {
-            System.out.println("Logged in as: User");
-        }
-    }
+    private void showMainMenu(GraphicsContext gc) {
+        mainStage.setTitle("Airline System");
 
-    public static int mainMenu() {
-        clearScreen();  // Ensure the screen is cleared before displaying the menu
-        printDashes();
-        System.out.println("Welcome to AirAsia Airline!");
-        printDashes();
-        System.out.println(getLoggedInUserInfo());  // Display user info
-        printDashes();
-        
-        System.out.println("1. View AirAsia Flight Network");
-        System.out.println("2. Search for an airport");
-        
-        if (loggedInUser != null) {
-            // User is logged in
-            if (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Staff")) {
-                System.out.println("3. Create Graph");  // Only visible to logged-in users (Admin or Staff)
-            }
-            System.out.println("4. Logout");         // Logout option if logged in
-            if (loggedInUser.getRole().equals("Admin")) {
-                System.out.println("5. Create new staff (Admins only)");
-            }
-            System.out.println("6. Traversal Algorithms"); // Visible to all logged-in users
-        } else {
-            // User is not logged in
-            System.out.println("3. Login");          // Login option if not logged in
-        }
-        
-        System.out.println("0. Exit Program");
-        System.out.print("Selection: ");
-        
-        return getIntInput();
-    }
-    
-    public static void handleUserInput(int userInput) {
-        switch (userInput) {
-            case 1:
-                viewFlightNetwork();
-                break;
-            case 2:
-                searchAirport();
-                break;
-            case 3:
-                if (loggedInUser != null && (loggedInUser.getRole().equals("Admin") || loggedInUser.getRole().equals("Staff"))) {
-                    createGraph();
-                } else {
-                    login();
-                }
-                break;
-            case 4:
-                if (loggedInUser != null) {
-                    logout();
-                } else {
-                    login();
-                }
-                break;
-            case 5:
-                if (loggedInUser != null && loggedInUser.getRole().equals("Admin")) {
-                    createNewStaff();
-                } else {
-                    System.out.println("Access denied. Admins only.");
-                }
-                break;
-            case 6:
-                if (loggedInUser != null) {
-                    traversalAlgorithmsMenu();
-                } else {
-                    System.out.println("Please log in to access traversal algorithms.");
-                }
-                break;
-            case 0:
-                System.out.println("Exiting program, thanks for using our program!");
-                break;
-            default:
-                System.out.println("Invalid selection. Please try again.");
-        }
-        pauseScreen(1000);
-    } 
-    
-    public static void traversalAlgorithmsMenu() {
-        clearScreen();
-        printDashes();
-        System.out.println("Traversal Algorithms");
-        printDashes();
-        System.out.println("1. Depth First Search (DFS)");
-        System.out.println("2. Breadth First Search (BFS)");
-        System.out.println("3. Find Shortest Path");
-        System.out.println("0. Return to Main Menu");
-        System.out.print("Selection: ");
-        
-        int userInput = getIntInput();
-        switch (userInput) {
-            case 1:
-                dfsTraversal();
-                break;
-            case 2:
-                bfsTraversal();
-                break;
-            case 3:
-                findShortestPath();
-                break;
-            case 0:
-                System.out.println("Returning to main menu...");
-                break;
-            default:
-                System.out.println("Invalid selection. Please try again.");
-        }
-        pauseScreen(1000);
-    }
-    
-    public static void findShortestPath() {
-        clearScreen();
-        printDashes();
-        System.out.println("Find Shortest Path");
-        printDashes();
-        
-        // Display all airports in ascending order
-        List<String> sortedVertices = new ArrayList<>(graph.getVertices());
-        Collections.sort(sortedVertices);
-        
-        System.out.println("Available Airports:");
-        for (String vertex : sortedVertices) {
-            System.out.println(vertex + " - " + graph.getCityName(vertex));
-        }
-        printDashes();
-        
-        System.out.print("Enter starting airport code: ");
-        String start = scanner.nextLine().toUpperCase();
-        System.out.print("Enter destination airport code: ");
-        String end = scanner.nextLine().toUpperCase();
-        
-        // Clear screen before showing the result
-        clearScreen();
-        
-        System.out.println("Shortest path from " + start + " (" + graph.getCityName(start) + ") to " + end + " (" + graph.getCityName(end) + "):");
-        
-        List<String> path = findShortestPathBFS(start, end);
-        printDashes();
+        Label lblStart = new Label("Start Airport Code:");
+        TextField txtStart = new TextField();
+        Label lblEnd = new Label("End Airport Code:");
+        TextField txtEnd = new TextField();
 
-        if (path != null) {
-            // Display airport codes
-            for (int i = 0; i < path.size(); i++) {
-                System.out.print(path.get(i));
-                if (i < path.size() - 1) {
-                    System.out.print(" --> ");
-                }
-            }
-            System.out.println();
-            
-            // Display airport city names
-            for (int i = 0; i < path.size(); i++) {
-                System.out.print(graph.getCityName(path.get(i)));
-                if (i < path.size() - 1) {
-                    System.out.print(" --> ");
-                }
-            }
-            System.out.println();
-        } else {
-            System.out.println("No path found from " + start + " to " + end);
-        }
+        Button btnAlgorithms = new Button("Algorithms");
+        Button btnEditor = new Button("Editor");
+        Button btnAirportInfo = new Button("Airport Info");
+        btnLoginLogout = new Button(loggedInUser == null ? "Login" : "Logout");
+        lblCurrentUser = new Label(getCurrentUserText());
 
-        printDashes();
-        System.out.println("Press Enter to return.");
-        scanner.nextLine();
-    }
-    
-    public static List<String> findShortestPathBFS(String start, String end) {
-        Map<String, String> prev = new HashMap<>();
-        Queue<String> queue = new LinkedList<>();
-        Set<String> visited = new HashSet<>();
-        
-        queue.add(start);
-        visited.add(start);
-        
-        while (!queue.isEmpty()) {
-            String current = queue.poll();
-            
-            if (current.equals(end)) {
-                // Build the path by following the `prev` map
-                List<String> path = new ArrayList<>();
-                for (String at = end; at != null; at = prev.get(at)) {
-                    path.add(at);
-                }
-                Collections.reverse(path);
-                return path;
-            }
-            
-            for (String neighbor : graph.getEdges(current)) {
-                if (!visited.contains(neighbor)) {
-                    queue.add(neighbor);
-                    visited.add(neighbor);
-                    prev.put(neighbor, current);
-                }
-            }
-        }
-        
-        return null; // No path found
-    }
+        HBox inputBox = new HBox(10, lblStart, txtStart, lblEnd, txtEnd);
+        VBox buttonBox = new VBox(10, btnAlgorithms, btnEditor, btnAirportInfo, lblCurrentUser, btnLoginLogout);
 
-    public static void viewFlightNetwork() {
-        clearScreen();
-        printDashes();
-        System.out.println("AirAsia Flight Network:");
-        printDashes();
-        
-        // Get all airport codes and sort them
-        List<String> sortedVertices = new ArrayList<>(graph.getVertices());
-        Collections.sort(sortedVertices);
-        
-        // Print airport codes with city names
-        for (String vertex : sortedVertices) {
-            String city = graph.getCityName(vertex);
-            if (city != null) {
-                System.out.println(vertex + " - " + city);
-            } else {
-                System.out.println(vertex + " - City not found");
-            }
-        }
-        
-        printDashes();
-        System.out.println("Flight Connections:");
-        printDashes();
-        
-        // Print connections in sorted order
-        for (String vertex : sortedVertices) {
-            List<String> edges = graph.getEdges(vertex);
-            Collections.sort(edges); 
-            for (String edge : edges) {
-                System.out.println(vertex + " -> " + edge);
-            }
-            System.out.println();
-        }
-        
-        printDashes();
-        System.out.println("Press Enter to exit.");
-        scanner.nextLine(); 
-    }
-
-    public static void createGraph() {
-        clearScreen();  
-        int graphInput;
-        do {
-            graphInput = graphMenu();
-            if (graphInput != 0) {
-                handleGraphInput(graphInput);
-            }
-        } while (graphInput != 0);
-        clearScreen();  
-    }   
-
-    public static int graphMenu() {
-        clearScreen();
-        printDashes();
-        System.out.println("Graph Creation Screen");
-        printDashes();
-        System.out.println("1. Add Airport");
-        System.out.println("2. Add Connection");
-        
-        // Admins only options
         if (loggedInUser != null && loggedInUser.getRole().equals("Admin")) {
-            System.out.println("3. Remove Airport");
-            System.out.println("4. Remove Connection");
+            Button btnCreateStaff = new Button("Create Staff");
+            buttonBox.getChildren().add(3, btnCreateStaff);
+            btnCreateStaff.setOnAction(e -> createStaff());
         }
 
-        System.out.println("0. Return to Main Menu");
-        System.out.print("Selection: ");
-        return getIntInput();
-    }
-    
-    public static void handleGraphInput(int graphInput) {
-        switch (graphInput) {
-            case 1:
-                addAirport();
-                break;
-            case 2:
-                addConnection();
-                break;
-            case 3:
-                if (loggedInUser != null && loggedInUser.getRole().equals("Admin")) {
-                    removeAirport();
-                } else {
-                    System.out.println("Access denied. Admins only.");
-                }
-                break;
-            case 4:
-                if (loggedInUser != null && loggedInUser.getRole().equals("Admin")) {
-                    removeConnection();
-                } else {
-                    System.out.println("Access denied. Admins only.");
-                }
-                break;
-            case 0:
-                System.out.println("Returning to main menu...");
-                break;
-            default:
-                System.out.println("Invalid selection. Please try again.");
-        }
-    }
-    
-    public static void addAirport() {
-        System.out.print("Enter airport code: ");
-        String code = scanner.nextLine().toUpperCase();
-        System.out.print("Enter airport city: ");
-        String city = scanner.nextLine();
-        graph.addVertex(code, city);
-        System.out.println("Airport added.");
-    }
-    
-    public static void addConnection() {
-        System.out.print("Enter source airport code: ");
-        String source = scanner.nextLine().toUpperCase();
-        System.out.print("Enter destination airport code: ");
-        String destination = scanner.nextLine().toUpperCase();
-        graph.addEdge(source, destination);
-        System.out.println("Connection added.");
-    }
-    
-    public static void removeAirport() {
-        System.out.print("Enter airport code to remove: ");
-        String code = scanner.nextLine().toUpperCase();
-        graph.removeVertex(code);
-        System.out.println("Airport removed.");
-    }
-    
-    public static void removeConnection() {
-        System.out.print("Enter source airport code: ");
-        String source = scanner.nextLine().toUpperCase();
-        System.out.print("Enter destination airport code: ");
-        String destination = scanner.nextLine().toUpperCase();
-        graph.removeEdge(source, destination);
-        System.out.println("Connection removed.");
-    }
+        createLoginBox();
 
-    public static void searchAirport() {
-	    clearScreen();
-	    printDashes();
-	    System.out.println("Search for an Airport");
-	    printDashes();
-	    
-	    System.out.print("Enter airport code to search: ");
-	    String code = scanner.nextLine().toUpperCase();
-	    
-	    String city = graph.getCityName(code);
-	    if (city != null) {
-	        System.out.println("Airport Code: " + code);
-	        System.out.println("City: " + city);
-	        printDashes();
-	        
-	        // Display direct flight path
-	        System.out.println("Direct Flight Path from " + code + ":");
-	        List<String> directFlights = graph.getEdges(code);
-	        if (directFlights.isEmpty()) {
-	            System.out.println("NONE");
-	        } else {
-	            for (String destination : directFlights) {
-	                System.out.println(destination + " - " + graph.getCityName(destination));
-	            }
-	        }
-	        printDashes();
-	        
-	        // Find unreachable locations using BFS
-	        System.out.println("Unreachable locations from " + code + ":");
-	        Set<String> reachable = bfs(code);
-	        List<String> allAirports = new ArrayList<>(graph.getVertices());
-	        allAirports.remove(code); // Remove the current airport from the list of unreachable locations
-	        allAirports.removeAll(reachable);
-	        
-	        if (allAirports.isEmpty()) {
-	            System.out.println("NONE");
-	        } else {
-	            for (String airport : allAirports) {
-	                System.out.println(airport + " - " + graph.getCityName(airport));
-	            }
-	        }
-	    } else {
-	        System.out.println("Airport not found.");
-	    }
-	    
-	    printDashes();
-	    System.out.println("Press Enter to exit.");
-	    scanner.nextLine(); // Wait for user input to exit
-    }
+        BorderPane root = new BorderPane();
+        root.setTop(inputBox);
+        root.setCenter(canvas);
+        root.setRight(buttonBox);
+        root.setBottom(loginBox);
 
-    public static Set<String> bfs(String start) {
-        Set<String> visited = new HashSet<>();
-        Queue<String> queue = new LinkedList<>();
-        
-        visited.add(start);
-        queue.add(start);
-        
-        while (!queue.isEmpty()) {
-            String current = queue.poll();
-            for (String neighbor : graph.getEdges(current)) {
-                if (!visited.contains(neighbor)) {
-                    visited.add(neighbor);
-                    queue.add(neighbor);
-                }
+        Scene scene = new Scene(root, 1000, 800);
+        mainStage.setScene(scene);
+        mainStage.show();
+
+        btnAlgorithms.setOnAction(e -> showAlgorithmsMenu(gc, txtStart, txtEnd));
+        btnEditor.setOnAction(e -> {
+            if (loggedInUser != null && (loggedInUser.getRole().equals("Staff") || loggedInUser.getRole().equals("Admin"))) {
+                showEditorMenu(gc);
+            } else {
+                showAlert("Access Denied", "You must be logged in as a Staff or Admin to access the editor.");
             }
-        }
-        
-        return visited;
+        });
+        btnAirportInfo.setOnAction(e -> showAirportInfo());
+        btnLoginLogout.setOnAction(e -> {
+            if (loggedInUser == null) {
+                loginUser();
+            } else {
+                logoutUser(gc);
+            }
+        });
     }
 
-    public static void dfsTraversal() {
-        clearScreen();
-        printDashes();
-        System.out.println("Depth First Search (DFS)");
-        printDashes();
+    private void createLoginBox() {
+        txtUsername = new TextField();
+        txtPassword = new PasswordField();
 
-        System.out.print("Enter starting airport code: ");
-        String startCode = scanner.nextLine().toUpperCase();
-        List<String> result = graph.dfs(startCode);
+        Label lblUsername = new Label("Username:");
+        Label lblPassword = new Label("Password:");
 
-        clearScreen();
-        System.out.println("DFS result:");
-        printDashes();
-
-        for (String airport : result) {
-            System.out.println(airport + " - " + graph.getCityName(airport));
-        }
-        printDashes();
-        System.out.println("Press Enter to return.");
-        scanner.nextLine();
-    }
-        
-    public static void bfsTraversal() {
-        clearScreen();
-        printDashes();
-        System.out.println("Breadth First Search (BFS)");
-        printDashes();
-
-        System.out.print("Enter starting airport code: ");
-        String startCode = scanner.nextLine().toUpperCase();
-        List<String> result = graph.bfs(startCode);
-
-        clearScreen();
-        System.out.println("BFS result:");
-        printDashes();
-
-        for (String airport : result) {
-            System.out.println(airport + " - " + graph.getCityName(airport));
-        }
-        
-        printDashes();
-        System.out.println("Press Enter to return.");
-        scanner.nextLine();
-    }
-
-	public static void createNewStaff() {
-	    clearScreen(); 
-	    System.out.println("Create New Staff");
-	    printDashes();
-	
-	    while (true) {
-	        System.out.print("Enter new staff username (or enter 0 to cancel): ");
-	        String username = scanner.nextLine();
-	        if (username.equals("0")) {
-	            System.out.println("Staff creation cancelled.");
-	            break;
-	        }
-	
-	        System.out.print("Enter new staff password: ");
-	        String password = scanner.nextLine();
-	        
-	        staffList.add(new Staff(username, password));
-	        System.out.println("Staff created successfully.");
-	        pauseScreen(1000);  
-	        clearScreen();  
-	        break; 
-	    }
-	}
-  
-    public static void login() {
-        clearScreen();  
-        System.out.print("Enter username: ");
-        String username = scanner.nextLine();
-        System.out.print("Enter password: ");
-        String password = scanner.nextLine();
-    
-        User user = authenticate(username, password);
-        if (user != null) {
-            loggedInUser = user;
-            System.out.println("Login successful.");
-            pauseScreen(1000);  
-            clearScreen();  
+        if (loggedInUser != null) {
+            lblUsername.setText("Logged in as: " + loggedInUser.getUsername() + " (" + loggedInUser.getRole() + ")");
+            loginBox = new VBox(10, lblUsername, btnLoginLogout);
         } else {
-            System.out.println("Invalid credentials.");
-            pauseScreen(1000);  
+            loginBox = new VBox(10, lblUsername, txtUsername, lblPassword, txtPassword, btnLoginLogout);
+        }
+
+        loginBox.setSpacing(10);
+    }
+
+    private void loginUser() {
+        String username = txtUsername.getText().trim();
+        String password = txtPassword.getText().trim();
+        if (authenticate(username, password)) {
+            showAlert("Login Successful", "Successfully logged in as " + loggedInUser.getUsername());
+            lblCurrentUser.setText(getCurrentUserText());
+            createLoginBox();  // Update the login box to reflect the logged-in state
+            showMainMenu(canvas.getGraphicsContext2D()); // Refresh the main menu to show/hide buttons
+        } else {
+            showAlert("Login Failed", "Invalid username or password.");
         }
     }
-    
 
-    public static void logout() {
+    private void logoutUser(GraphicsContext gc) {
         loggedInUser = null;
-        System.out.println("Logout successful.");
+        showAlert("Logout Successful", "Successfully logged out.");
+        lblCurrentUser.setText(getCurrentUserText());
+        createLoginBox();  // Update the login box to reflect the logged-out state
+        airportMovementEnabled = false;  // Disable airport movement
+        canvas.setOnMousePressed(null);
+        canvas.setOnMouseDragged(null);
+        showMainMenu(gc);  // Refresh the main menu
     }
 
-    public static User authenticate(String username, String password) {
+    private boolean authenticate(String username, String password) {
         for (Admin admin : adminList) {
             if (admin.getUsername().equals(username) && admin.getPassword().equals(password)) {
-                return admin;
+                loggedInUser = admin;
+                return true;
             }
         }
         for (Staff staff : staffList) {
             if (staff.getUsername().equals(username) && staff.getPassword().equals(password)) {
-                return staff;
+                loggedInUser = staff;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void showAlgorithmsMenu(GraphicsContext gc, TextField txtStart, TextField txtEnd) {
+        resetAirportHighlighting(gc);
+
+        VBox dialogBox = new VBox(10);
+
+        Button btnDFS = new Button("DFS Traversal");
+        Button btnBFS = new Button("BFS Traversal");
+        Button btnShortestPath = new Button("Find Shortest Path");
+
+        btnDFS.setOnAction(e -> {
+            String start = txtStart.getText().trim().toUpperCase();
+            if (start.isEmpty()) {
+                showAlert("DFS Traversal", "Please enter the start airport code.");
+            } else {
+                dfsTraversal(gc, start);
+            }
+        });
+
+        btnBFS.setOnAction(e -> {
+            String start = txtStart.getText().trim().toUpperCase();
+            if (start.isEmpty()) {
+                showAlert("BFS Traversal", "Please enter the start airport code.");
+            } else {
+                bfsTraversal(gc, start);
+            }
+        });
+
+        btnShortestPath.setOnAction(e -> {
+            String start = txtStart.getText().trim().toUpperCase();
+            String end = txtEnd.getText().trim().toUpperCase();
+            if (start.isEmpty() || end.isEmpty()) {
+                showAlert("Find Shortest Path", "Please enter both start and end airport codes.");
+            } else {
+                findShortestPath(gc, start, end);
+            }
+        });
+
+        dialogBox.getChildren().addAll(btnDFS, btnBFS, btnShortestPath);
+        Scene dialogScene = new Scene(dialogBox, 300, 200);
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Algorithms");
+        dialogStage.setScene(dialogScene);
+        dialogStage.show();
+    }
+
+    private void resetAirportHighlighting(GraphicsContext gc) {
+        viewGraph(gc);
+    }
+
+    private void showEditorMenu(GraphicsContext gc) {
+        mainStage.setTitle("Editor");
+
+        Button btnAddAirport = new Button("Add Airport");
+        Button btnDeleteAirport = new Button("Delete Airport");
+        Button btnAddConnection = new Button("Add Connection");
+        Button btnRemoveConnection = new Button("Remove Connection");
+        Button btnMoveAirport = new Button("Move Airport");
+        Button btnSaveChanges = new Button("Stop moving airports");
+        Button btnReturn = new Button("Return to Main Menu");
+
+        VBox editorBox = new VBox(10, btnAddAirport, btnAddConnection, btnMoveAirport, btnSaveChanges, btnDeleteAirport, btnRemoveConnection, btnReturn);
+
+        BorderPane editorRoot = new BorderPane();
+        editorRoot.setCenter(canvas);
+        editorRoot.setRight(editorBox);
+
+        Scene editorScene = new Scene(editorRoot, 1000, 800);
+        mainStage.setScene(editorScene);
+
+        btnAddAirport.setOnAction(e -> addAirport());
+        btnDeleteAirport.setOnAction(e -> deleteAirport());
+        btnAddConnection.setOnAction(e -> addConnection());
+        btnRemoveConnection.setOnAction(e -> removeConnection());
+        btnMoveAirport.setOnAction(e -> {
+            airportMovementEnabled = true;
+            savedPositions = new HashMap<>(positions); 
+            enableAirportMovement(gc);
+        });
+        btnSaveChanges.setOnAction(e -> {
+            airportMovementEnabled = false;
+            disableAirportMovement(gc);
+        });
+        btnReturn.setOnAction(e -> {
+            airportMovementEnabled = false;
+            disableAirportMovement(gc);
+            showMainMenu(gc);
+        });
+
+        if (loggedInUser != null && loggedInUser.getRole().equals("Staff")) {
+            editorBox.getChildren().remove(btnDeleteAirport);
+            editorBox.getChildren().remove(btnRemoveConnection);
+        }
+    }
+
+    private void showAirportInfo() {
+        Stage infoStage = new Stage();
+        infoStage.setTitle("Airport Information");
+
+        VBox airportInfoBox = new VBox(10);
+        for (String code : positions.keySet()) {
+            Label lblAirport = new Label(code + " - " + graph.getCityName(code));
+            airportInfoBox.getChildren().add(lblAirport);
+        }
+
+        Scene infoScene = new Scene(airportInfoBox, 300, 400);
+        infoStage.setScene(infoScene);
+        infoStage.show();
+    }
+
+    private void addAirport() {
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Add Airport");
+
+        Label lblCode = new Label("Airport Code:");
+        TextField txtCode = new TextField();
+        Label lblName = new Label("Airport Name:");
+        TextField txtName = new TextField();
+        Button btnAdd = new Button("Add");
+
+        btnAdd.setOnAction(e -> {
+            String code = txtCode.getText().trim().toUpperCase();
+            String name = txtName.getText().trim();
+            if (code.isEmpty() || name.isEmpty()) {
+                showAlert("Add Airport", "Please enter both code and name.");
+            } else if (graph.hasVertex(code)) {
+                showAlert("Add Airport", "Airport code already exists.");
+            } else {
+                graph.addVertex(code, name);
+                positions.put(code, new double[]{100, 100});  // Add default position
+                showAlert("Add Airport", "Airport " + code + " (" + name + ") added.");
+                viewGraph(canvas.getGraphicsContext2D()); // Refresh graph view
+                dialogStage.close();
+            }
+        });
+
+        VBox dialogBox = new VBox(10, lblCode, txtCode, lblName, txtName, btnAdd);
+        Scene dialogScene = new Scene(dialogBox, 300, 200);
+        dialogStage.setScene(dialogScene);
+        dialogStage.show();
+    }
+
+    private void deleteAirport() {
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Delete Airport");
+
+        Label lblCode = new Label("Airport Code:");
+        TextField txtCode = new TextField();
+        Button btnDelete = new Button("Delete");
+
+        btnDelete.setOnAction(e -> {
+            String code = txtCode.getText().trim().toUpperCase();
+            if (code.isEmpty()) {
+                showAlert("Delete Airport", "Please enter the airport code.");
+            } else if (!graph.hasVertex(code)) {
+                showAlert("Delete Airport", "Airport code does not exist.");
+            } else {
+                graph.removeVertex(code);
+                positions.remove(code);  // Remove position
+                showAlert("Delete Airport", "Airport " + code + " removed.");
+                viewGraph(canvas.getGraphicsContext2D()); // Refresh graph view
+                dialogStage.close();
+            }
+        });
+
+        VBox dialogBox = new VBox(10, lblCode, txtCode, btnDelete);
+        Scene dialogScene = new Scene(dialogBox, 300, 200);
+        dialogStage.setScene(dialogScene);
+        dialogStage.show();
+    }
+
+    private void addConnection() {
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Add Connection");
+
+        Label lblFrom = new Label("From Airport:");
+        TextField txtFrom = new TextField();
+        Label lblTo = new Label("To Airport:");
+        TextField txtTo = new TextField();
+        Label lblDistance = new Label("Distance:");
+        TextField txtDistance = new TextField();
+        Button btnAdd = new Button("Add");
+
+        btnAdd.setOnAction(e -> {
+            String from = txtFrom.getText().trim().toUpperCase();
+            String to = txtTo.getText().trim().toUpperCase();
+            int distance;
+            try {
+                distance = Integer.parseInt(txtDistance.getText().trim());
+            } catch (NumberFormatException ex) {
+                showAlert("Add Connection", "Invalid distance. Please enter a valid number.");
+                return;
+            }
+            if (from.isEmpty() || to.isEmpty() || distance <= 0) {
+                showAlert("Add Connection", "Please enter valid airport codes and a positive distance.");
+            } else if (!graph.hasVertex(from) || !graph.hasVertex(to)) {
+                showAlert("Add Connection", "One or both airport codes do not exist.");
+            } else {
+                graph.addConnection(from, to, distance);
+                showAlert("Add Connection", "Connection from " + from + " to " + to + " added.");
+                viewGraph(canvas.getGraphicsContext2D()); // Refresh graph view
+                dialogStage.close();
+            }
+        });
+
+        VBox dialogBox = new VBox(10, lblFrom, txtFrom, lblTo, txtTo, lblDistance, txtDistance, btnAdd);
+        Scene dialogScene = new Scene(dialogBox, 300, 200);
+        dialogStage.setScene(dialogScene);
+        dialogStage.show();
+    }
+
+    private void removeConnection() {
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Remove Connection");
+
+        Label lblFrom = new Label("From Airport:");
+        TextField txtFrom = new TextField();
+        Label lblTo = new Label("To Airport:");
+        TextField txtTo = new TextField();
+        Button btnRemove = new Button("Remove");
+
+        btnRemove.setOnAction(e -> {
+            String from = txtFrom.getText().trim().toUpperCase();
+            String to = txtTo.getText().trim().toUpperCase();
+            if (from.isEmpty() || to.isEmpty()) {
+                showAlert("Remove Connection", "Please enter valid airport codes.");
+            } else if (!graph.hasVertex(from) || !graph.hasVertex(to)) {
+                showAlert("Remove Connection", "One or both airport codes do not exist.");
+            } else if (!graph.hasConnection(from, to)) {
+                showAlert("Remove Connection", "No connection exists between " + from + " and " + to + ".");
+            } else {
+                graph.removeConnection(from, to);
+                showAlert("Remove Connection", "Connection from " + from + " to " + to + " removed.");
+                viewGraph(canvas.getGraphicsContext2D()); // Refresh graph view
+                dialogStage.close();
+            }
+        });
+
+        VBox dialogBox = new VBox(10, lblFrom, txtFrom, lblTo, txtTo, btnRemove);
+        Scene dialogScene = new Scene(dialogBox, 300, 200);
+        dialogStage.setScene(dialogScene);
+        dialogStage.show();
+    }
+
+    private void enableAirportMovement(GraphicsContext gc) {
+        canvas.setOnMousePressed(e -> startMovingAirport(e));
+        canvas.setOnMouseDragged(e -> dragAirport(e, gc));
+    }
+
+    private void disableAirportMovement(GraphicsContext gc) {
+        canvas.setOnMousePressed(null);
+        canvas.setOnMouseDragged(null);
+        movingAirportCode = null;
+    }
+
+    private String movingAirportCode;
+
+    private void startMovingAirport(MouseEvent e) {
+        movingAirportCode = findAirportAtPosition(e.getX(), e.getY());
+    }
+
+    private void dragAirport(MouseEvent e, GraphicsContext gc) {
+        if (movingAirportCode != null && e.getButton() == MouseButton.PRIMARY) {
+            double[] position = positions.get(movingAirportCode);
+
+            // Enforce boundary conditions
+            double newX = Math.max(0, Math.min(e.getX(), canvas.getWidth() - 50));
+            double newY = Math.max(0, Math.min(e.getY(), canvas.getHeight() - 50));
+
+            position[0] = newX;
+            position[1] = newY;
+
+            viewGraph(gc);  // Refresh graph view
+        }
+    }
+
+    private String findAirportAtPosition(double x, double y) {
+        final double radius = 20;
+        for (Map.Entry<String, double[]> entry : positions.entrySet()) {
+            double[] position = entry.getValue();
+            if (Math.abs(position[0] - x) < radius && Math.abs(position[1] - y) < radius) {
+                return entry.getKey();
             }
         }
         return null;
     }
 
-    public static void clearScreen() {
-        try {
-            String os = System.getProperty("os.name");
-            if (os.contains("Windows")) {
-                new ProcessBuilder("cmd", "/c", "cls").inheritIO().start().waitFor();
+    private void createStaff() {
+        Stage dialogStage = new Stage();
+        dialogStage.setTitle("Create Staff");
+
+        Label lblUsername = new Label("Username:");
+        TextField txtUsername = new TextField();
+        Label lblPassword = new Label("Password:");
+        PasswordField txtPassword = new PasswordField();
+        Button btnCreate = new Button("Create");
+
+        btnCreate.setOnAction(e -> {
+            String username = txtUsername.getText().trim();
+            String password = txtPassword.getText().trim();
+            if (username.isEmpty() || password.isEmpty()) {
+                showAlert("Create Staff", "Please enter both username and password.");
+            } else if (isUsernameTaken(username)) {
+                showAlert("Create Staff", "Username already taken.");
             } else {
-                System.out.print("\033[H\033[2J");
-                System.out.flush();
+                Staff newStaff = new Staff(username, password);
+                staffList.add(newStaff);
+                showAlert("Create Staff", "New staff member created.");
+                dialogStage.close();
             }
-        } catch (IOException | InterruptedException ex) {
-            System.out.println("Error clearing the screen.");
-        }
-    }
-    
-    public static void printDashes() {
-        System.out.println("------------------------------");
-    }
-    
-    public static int getInput() {
-        return getIntInput();
+        });
+
+        VBox dialogBox = new VBox(10, lblUsername, txtUsername, lblPassword, txtPassword, btnCreate);
+        Scene dialogScene = new Scene(dialogBox, 300, 200);
+        dialogStage.setScene(dialogScene);
+        dialogStage.show();
     }
 
-    public static String getLoggedInUserInfo() {
-        if (loggedInUser != null) {
-            return "You are logged in as " + loggedInUser.getUsername() + "\nRole: " + loggedInUser.getRole();
+    private boolean isUsernameTaken(String username) {
+        for (Admin admin : adminList) {
+            if (admin.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        for (Staff staff : staffList) {
+            if (staff.getUsername().equals(username)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String getCurrentUserText() {
+        if (loggedInUser == null) {
+            return "Not logged in";
         } else {
-            return "You are not logged in";
+            return "Logged in as: " + loggedInUser.getUsername() + " (" + loggedInUser.getRole() + ")";
         }
     }
-    
-    public static int getIntInput() {
-        while (!scanner.hasNextInt()) {
-            System.out.println("Invalid input. Please enter a number.");
-            scanner.next(); 
+
+    private static void initializeGraph() {
+        String[][] airports = {
+            {"KUL", "Kuala Lumpur"}, {"SIN", "Singapore"}, {"BKK", "Bangkok"}, {"HKG", "Hong Kong"},
+            {"NRT", "Tokyo Narita"}, {"SYD", "Sydney"}, {"LAX", "Los Angeles"}, {"JFK", "New York JFK"}, 
+            {"LHR", "London Heathrow"}, {"CDG", "Paris Charles de Gaulle"}
+        };
+        
+        for (String[] airport : airports) {
+            graph.addVertex(airport[0].toUpperCase(), airport[1]);
         }
-        int input = scanner.nextInt();
-        scanner.nextLine(); 
-        return input;
+        
+        String[][] connections = {
+            {"KUL", "SIN"}, {"SIN", "HKG"}, {"HKG", "NRT"}, {"NRT", "SYD"}, 
+            {"SYD", "LAX"}, {"LAX", "JFK"}, {"JFK", "LHR"}, {"LHR", "CDG"}, {"CDG", "BKK"}, {"BKK", "KUL"}
+        };
+        
+        for (String[] connection : connections) {
+            graph.addConnection(connection[0].toUpperCase(), connection[1].toUpperCase(), 1);
+        }
     }
-    
-    
-    public static void pauseScreen(int milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+
+    private static void initializeUsers() {
+        Admin admin = new Admin("Admin", "Admin123", "Admin");
+        adminList.add(admin);
+
+        Staff staff = new Staff("Staff", "Staff123");
+        staffList.add(staff);
+    }
+
+    private void viewGraph(GraphicsContext gc) {
+        if (!positions.containsKey("KUL")) {  // Check if positions are already initialized
+            positions.put("KUL", new double[]{100, 100});
+            positions.put("SIN", new double[]{200, 100});
+            positions.put("BKK", new double[]{300, 100});
+            positions.put("HKG", new double[]{400, 100});
+            positions.put("NRT", new double[]{500, 100});
+            positions.put("SYD", new double[]{300, 200});
+            positions.put("LAX", new double[]{400, 200});
+            positions.put("JFK", new double[]{500, 200});
+            positions.put("LHR", new double[]{600, 100});
+            positions.put("CDG", new double[]{600, 200});
         }
+
+        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+        gc.setFont(Font.font("Arial", Font.getDefault().getSize() * 1.5));
+        gc.setFill(Color.BLACK);
+        graph.draw(gc, positions);
+    }
+
+    private void dfsTraversal(GraphicsContext gc, String start) {
+        List<String> path = graph.dfs(start);
+        viewGraph(gc); // Refresh graph view
+        graph.animateTraversal(gc, positions, path);
+        resetAirportHighlighting(gc);
+    }
+
+    private void bfsTraversal(GraphicsContext gc, String start) {
+        List<String> path = graph.bfs(start);
+        viewGraph(gc); // Refresh graph view
+        graph.animateTraversal(gc, positions, path);
+        resetAirportHighlighting(gc);
+    }
+
+    private void findShortestPath(GraphicsContext gc, String start, String end) {
+        List<String> path = graph.findShortestPath(start, end);
+        if (path == null || path.isEmpty()) {
+            showAlert("Find Shortest Path", "No path found between " + start + " and " + end + ".");
+        } else {
+            viewGraph(gc); // Refresh graph view
+            graph.animateTraversal(gc, positions, path);
+            resetAirportHighlighting(gc);
+        }
+    }
+
+    private void showAlert(String title, String message) {
+        Alert alert = new Alert(AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
