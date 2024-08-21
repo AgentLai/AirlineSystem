@@ -1,18 +1,25 @@
-Default admin access
+Default admin credentials:
 Username: Admin
 Password: Admin123
 
-Driver class is "AirlineSystem"
+Default staff credentials:
+Username: Staff
+Password: Staff123
 
-30 default airports
-"KUL", "SIN", "BKK", "HKG", "NRT", "PEK", "SYD", "MEL", "LAX", "JFK",
-"LHR", "CDG", "AMS", "FRA", "DXB", "DOH", "ICN", "IST", "BCN", "MAD",
-"FCO", "VIE", "ZRH", "CPT", "JNB", "GRU", "EZE", "YYZ", "YVR", "SFO"
+Step 1: Download and install JavaFx, Java JDK
+Step 2: 
 
-Default connections between each airport
-{"KUL", "SIN"}, {"KUL", "BKK"}, {"SIN", "HKG"}, {"HKG", "NRT"}, {"NRT", "PEK"}, 
-{"PEK", "SYD"}, {"SYD", "MEL"}, {"MEL", "LAX"}, {"LAX", "JFK"}, {"JFK", "LHR"},
-{"LHR", "CDG"}, {"CDG", "AMS"}, {"AMS", "FRA"}, {"FRA", "DXB"}, {"DXB", "DOH"},
-{"DOH", "ICN"}, {"ICN", "IST"}, {"IST", "BCN"}, {"BCN", "MAD"}, {"MAD", "FCO"},
-{"FCO", "VIE"}, {"VIE", "ZRH"}, {"ZRH", "CPT"}, {"CPT", "JNB"}, {"JNB", "GRU"},
-{"GRU", "EZE"}, {"EZE", "YYZ"}, {"YYZ", "YVR"}, {"YVR", "SFO"}, {"SFO", "KUL"}
+Notes:
+- Please replace "REPLACE THIS WITH YOUR PATH TO JAVAFX LIB" with the actual path of your JavaFX/lib path.
+
+
+How to compile the code:
+javac --module-path "REPLACE THIS WITH YOUR PATH TO JAVAFX LIB" --add-modules javafx.controls,javafx.fxml *.java
+
+How to run the application:
+java --module-path "REPLACE THIS WITH YOUR PATH TO JAVAFX LIB" --add-modules javafx.controls,javafx.fxml AirlineSystem
+
+
+TODO AT 12:
+- Fix algorithms
+- Create README 
