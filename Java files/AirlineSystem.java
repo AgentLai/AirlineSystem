@@ -399,16 +399,16 @@ public class AirlineSystem {
     
     public static void removeAirport() {
         System.out.print("Enter airport code to remove: ");
-        String code = scanner.nextLine();
+        String code = scanner.nextLine().toUpperCase();
         graph.removeVertex(code);
         System.out.println("Airport removed.");
     }
     
     public static void removeConnection() {
         System.out.print("Enter source airport code: ");
-        String source = scanner.nextLine();
+        String source = scanner.nextLine().toUpperCase();
         System.out.print("Enter destination airport code: ");
-        String destination = scanner.nextLine();
+        String destination = scanner.nextLine().toUpperCase();
         graph.removeEdge(source, destination);
         System.out.println("Connection removed.");
     }
