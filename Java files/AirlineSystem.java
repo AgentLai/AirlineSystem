@@ -18,7 +18,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
-
+import javafx.geometry.Insets;
 import java.util.*;
 
 public class AirlineSystem extends Application {
@@ -45,12 +45,36 @@ public class AirlineSystem extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        mainStage = primaryStage;
-        canvas = new Canvas(800, 600);
-        GraphicsContext gc = canvas.getGraphicsContext2D();
+    mainStage = primaryStage;
+
+    // Set an explicit initial window size
+    mainStage.setWidth(1000);
+    mainStage.setHeight(800);
+
+    canvas = new Canvas(800, 600);
+    GraphicsContext gc = canvas.getGraphicsContext2D();
+    viewGraph(gc);
+    showMainMenu(gc);
+
+    // Make the canvas responsive
+    canvas.widthProperty().bind(mainStage.widthProperty().subtract(200));  // Adjust based on right VBox
+    canvas.heightProperty().bind(mainStage.heightProperty().subtract(100)); // Adjust based on top HBox
+
+    canvas.widthProperty().addListener((obs, oldVal, newVal) -> {
         viewGraph(gc);
-        showMainMenu(gc);
-    }
+    });
+
+    canvas.heightProperty().addListener((obs, oldVal, newVal) -> {
+        viewGraph(gc);
+    });
+
+    // Ensure the stage is not resizable to fullscreen on launch
+    mainStage.setResizable(true);
+    mainStage.setMaximized(false);  // Prevents the stage from launching maximized
+
+    // Display the stage
+    mainStage.show();
+}
 
     private void showMainMenu(GraphicsContext gc) {
         mainStage.setTitle("Airline System");
@@ -67,26 +91,31 @@ public class AirlineSystem extends Application {
         lblCurrentUser = new Label(getCurrentUserText());
 
         HBox inputBox = new HBox(10, lblStart, txtStart, lblEnd, txtEnd);
-        VBox buttonBox = new VBox(10, btnAlgorithms, btnEditor, btnAirportInfo, lblCurrentUser, btnLoginLogout);
 
-        if (loggedInUser != null && loggedInUser.getRole().equals("Admin")) {
-            Button btnCreateStaff = new Button("Create Staff");
-            buttonBox.getChildren().add(3, btnCreateStaff);
-            btnCreateStaff.setOnAction(e -> createStaff());
-        }
-
+        // Create and style the login box
         createLoginBox();
+        VBox loginContainer = new VBox(10, loginBox, btnLoginLogout);
+        loginContainer.setPadding(new Insets(10));
+        loginContainer.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: #f0f0f0;");
+
+        // Create and style the button box
+        VBox buttonBox = new VBox(10, btnAlgorithms, btnEditor, btnAirportInfo, lblCurrentUser);
+        buttonBox.setPadding(new Insets(10));
+        buttonBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: #f0f0f0;");
+
+        // Adjust the layout to place the login box above the button box
+        VBox rightContainer = new VBox(20, loginContainer, buttonBox);  // Login box above the button box
+        rightContainer.setPadding(new Insets(10));  // Add padding to the right container
 
         BorderPane root = new BorderPane();
         root.setTop(inputBox);
         root.setCenter(canvas);
-        root.setRight(buttonBox);
-        root.setBottom(loginBox);
+        root.setRight(rightContainer);
 
         Scene scene = new Scene(root, 1000, 800);
         mainStage.setScene(scene);
-        mainStage.show();
 
+        // Set up event handlers for buttons
         btnAlgorithms.setOnAction(e -> showAlgorithmsMenu(gc, txtStart, txtEnd));
         btnEditor.setOnAction(e -> {
             if (loggedInUser != null && (loggedInUser.getRole().equals("Staff") || loggedInUser.getRole().equals("Admin"))) {
@@ -531,22 +560,36 @@ public class AirlineSystem extends Application {
     }
 
     private void viewGraph(GraphicsContext gc) {
-        if (!positions.containsKey("KUL")) {  // Check if positions are already initialized
-            positions.put("KUL", new double[]{100, 100});
-            positions.put("SIN", new double[]{200, 100});
-            positions.put("BKK", new double[]{300, 100});
-            positions.put("HKG", new double[]{400, 100});
-            positions.put("NRT", new double[]{500, 100});
-            positions.put("SYD", new double[]{300, 200});
-            positions.put("LAX", new double[]{400, 200});
-            positions.put("JFK", new double[]{500, 200});
-            positions.put("LHR", new double[]{600, 100});
-            positions.put("CDG", new double[]{600, 200});
+        double width = canvas.getWidth();
+        double height = canvas.getHeight();
+    
+        // Initialize positions only if they haven't been set yet
+        if (!positions.containsKey("KUL")) {
+            double xOffset = width * 0.1;
+            double yOffset = height * 0.1;
+            double xSpacing = width * 0.1;
+            double ySpacing = height * 0.2;
+    
+            positions.put("KUL", new double[]{xOffset, yOffset});
+            positions.put("SIN", new double[]{xOffset + xSpacing, yOffset});
+            positions.put("BKK", new double[]{xOffset + 2 * xSpacing, yOffset});
+            positions.put("HKG", new double[]{xOffset + 3 * xSpacing, yOffset});
+            positions.put("NRT", new double[]{xOffset + 4 * xSpacing, yOffset});
+            positions.put("SYD", new double[]{xOffset + 2 * xSpacing, yOffset + ySpacing});
+            positions.put("LAX", new double[]{xOffset + 3 * xSpacing, yOffset + ySpacing});
+            positions.put("JFK", new double[]{xOffset + 4 * xSpacing, yOffset + ySpacing});
+            positions.put("LHR", new double[]{xOffset + 5 * xSpacing, yOffset});
+            positions.put("CDG", new double[]{xOffset + 5 * xSpacing, yOffset + ySpacing});
         }
-
-        gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
-        gc.setFont(Font.font("Arial", Font.getDefault().getSize() * 1.5));
+    
+        // Clear the canvas
+        gc.clearRect(0, 0, width, height);
+    
+        // Set font size relative to the canvas size
+        gc.setFont(Font.font("Arial", Math.min(width, height) * 0.025));
         gc.setFill(Color.BLACK);
+    
+        // Redraw the graph based on updated positions
         graph.draw(gc, positions);
     }
 
