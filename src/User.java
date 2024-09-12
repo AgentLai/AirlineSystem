@@ -13,8 +13,16 @@ public abstract class User {
         return username;
     }
 
+    public void setUsername(String username) { 
+        this.username = username;
+    }
+
     public String getPassword() {
         return password;
+    }
+
+    public void setPassword(String newPassword) {
+        this.password = newPassword;
     }
 
     public String getRole() {

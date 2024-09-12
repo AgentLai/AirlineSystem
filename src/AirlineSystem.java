@@ -7,7 +7,9 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.PasswordField;
 import javafx.scene.input.MouseButton;
@@ -20,6 +22,7 @@ import javafx.scene.text.Font;
 import javafx.scene.paint.Color;
 import javafx.geometry.Insets;
 import java.util.*;
+import java.time.LocalDate;
 
 public class AirlineSystem extends Application {
     private static Graph graph = new Graph();
@@ -37,6 +40,7 @@ public class AirlineSystem extends Application {
     private VBox loginBox;
     private boolean airportMovementEnabled = false;
 
+
     public static void main(String[] args) {
         initializeGraph();
         initializeUsers();
@@ -45,94 +49,452 @@ public class AirlineSystem extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-    mainStage = primaryStage;
+	    mainStage = primaryStage;
+	
+	    // Set an explicit initial window size
+	    mainStage.setWidth(1000);
+	    mainStage.setHeight(800);
+	
+	    canvas = new Canvas(800, 600);
+	    GraphicsContext gc = canvas.getGraphicsContext2D();
+	    viewGraph(gc);
+	    showMainMenu(gc);
+	
+	    // Make the canvas responsive
+	    canvas.widthProperty().bind(mainStage.widthProperty().subtract(200));  // Adjust based on right VBox
+	    canvas.heightProperty().bind(mainStage.heightProperty().subtract(100)); // Adjust based on top HBox
+	
+	    canvas.widthProperty().addListener((obs, oldVal, newVal) -> {
+	        viewGraph(gc);
+	    });
+	
+	    canvas.heightProperty().addListener((obs, oldVal, newVal) -> {
+	        viewGraph(gc);
+	    });
+	
+	    // Ensure the stage is not resizable to fullscreen on launch
+	    mainStage.setResizable(true);
+	    mainStage.setMaximized(false);  // Prevents the stage from launching maximized
+	
+	    // Display the stage
+	    mainStage.show();
+	}
 
-    // Set an explicit initial window size
-    mainStage.setWidth(1000);
-    mainStage.setHeight(800);
+	private void showMainMenu(GraphicsContext gc) {
+	    mainStage.setTitle("Airline System");
+	
+	    Label lblStart = new Label("Start Airport Code:");
+	    TextField txtStart = new TextField();
+	    Label lblEnd = new Label("End Airport Code:");
+	    TextField txtEnd = new TextField();
+	
+	    Button btnAlgorithms = new Button("Algorithms");
+	    Button btnEditor = new Button("Editor");
+	    Button btnAirportInfo = new Button("Airport Info");
+	    btnLoginLogout = new Button(loggedInUser == null ? "Login" : "Logout");
+	    lblCurrentUser = new Label(getCurrentUserText());
+	
+	    // Create Profile button only if the user is logged in as Staff
+	    Button btnProfile = null;
+	    if (loggedInUser != null && "Staff".equals(loggedInUser.getRole())) {
+	        btnProfile = new Button("Profile");
+	        VBox.setMargin(btnProfile, new Insets(5, 0, 5, 0));
+	        btnProfile.setOnAction(e -> showProfilePage());
+	    }
+	
+	    HBox inputBox = new HBox(10, lblStart, txtStart, lblEnd, txtEnd);
+	
+	    // Create and style the login box
+	    createLoginBox();
+	    VBox loginContainer = new VBox(10, loginBox);
+	    if (btnProfile != null) {
+	        loginContainer.getChildren().add(btnProfile);
+	    }
+	    loginContainer.getChildren().add(btnLoginLogout); // Add logout button after profile button, if present
+	    loginContainer.setPadding(new Insets(10));
+	    loginContainer.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: #f0f0f0;");
+	
+	    // Create and style the button box
+	    VBox buttonBox = new VBox(10, btnAlgorithms, btnEditor, btnAirportInfo);
+	
+	    if (loggedInUser != null && "Admin".equals(loggedInUser.getRole())) {
+	        Button btnStaff = new Button("Staff Management");
+	        VBox.setMargin(btnStaff, new Insets(5, 0, 5, 0));
+	        btnStaff.setOnAction(e -> showStaffPage());
+	        buttonBox.getChildren().add(btnStaff);
+	    }
+	
+	    buttonBox.getChildren().add(lblCurrentUser);
+	    buttonBox.setPadding(new Insets(10));
+	    buttonBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: #f0f0f0;");
+	
+	    VBox rightContainer = new VBox(20, loginContainer, buttonBox);
+	    rightContainer.setPadding(new Insets(10));
+	
+	    BorderPane root = new BorderPane();
+	    root.setTop(inputBox);
+	    root.setCenter(canvas);
+	    root.setRight(rightContainer);
+	
+	    Scene scene = new Scene(root, 1000, 800);
+	    mainStage.setScene(scene);
+	
+	    btnAlgorithms.setOnAction(e -> showAlgorithmsMenu(gc, txtStart, txtEnd));
+	    btnEditor.setOnAction(e -> {
+	        if (loggedInUser != null && ("Staff".equals(loggedInUser.getRole()) || "Admin".equals(loggedInUser.getRole()))) {
+	            showEditorMenu(gc);
+	        } else {
+	            showAlert("Access Denied", "You must be logged in as a Staff or Admin to access the editor.");
+	        }
+	    });
+	    btnAirportInfo.setOnAction(e -> showAirportInfo());
+	    btnLoginLogout.setOnAction(e -> {
+	        if (loggedInUser == null) {
+	            loginUser();
+	        } else {
+	            logoutUser(gc);
+	        }
+	    });
+	}
 
-    canvas = new Canvas(800, 600);
-    GraphicsContext gc = canvas.getGraphicsContext2D();
-    viewGraph(gc);
-    showMainMenu(gc);
+    
+	private void showStaffPage() {
+	    if (loggedInUser == null || !"Admin".equals(loggedInUser.getRole())) {
+	        showAlert("Access Denied", "You must be an Admin to access the Staff Management page.");
+	        return;
+	    }
+	
+	    Stage staffStage = new Stage();
+	    staffStage.setTitle("Staff Management");
+	
+	    Button btnCheckStaff = new Button("Check staff list");
+	    btnCheckStaff.setOnAction(e -> checkStaffList());
+	
+	    Button btnCreateStaff = new Button("Create new staff");
+	    btnCreateStaff.setOnAction(e -> createNewStaff());
+	
+	    Button btnDeleteStaff = new Button("Delete old staff");
+	    btnDeleteStaff.setOnAction(e -> deleteOldStaff());
+	
+	    Button btnResetPassword = new Button("Reset password for staff");
+	    btnResetPassword.setOnAction(e -> resetStaffPassword());
+	
+	    VBox vbox = new VBox(10, btnCheckStaff, btnCreateStaff, btnDeleteStaff, btnResetPassword);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 200);
+	    staffStage.setScene(scene);
+	    staffStage.show();
+	}
+	
+	private void checkStaffList() {
+	    Stage listStage = new Stage();
+	    listStage.setTitle("Staff List");
+	
+	    ListView<String> staffListView = new ListView<>();
+	    for (Staff staff : staffList) {
+	        staffListView.getItems().add(staff.getUsername());
+	    }
+	
+	    VBox vbox = new VBox(staffListView);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 400);
+	    listStage.setScene(scene);
+	    listStage.show();
+	}
 
-    // Make the canvas responsive
-    canvas.widthProperty().bind(mainStage.widthProperty().subtract(200));  // Adjust based on right VBox
-    canvas.heightProperty().bind(mainStage.heightProperty().subtract(100)); // Adjust based on top HBox
+	private void createNewStaff() {
+	    Stage createStage = new Stage();
+	    createStage.setTitle("Create New Staff");
+	
+	    Label lblUsername = new Label("Enter Username:");
+	    TextField txtUsername = new TextField();
+	    Label lblPassword = new Label("Enter Password:");
+	    TextField txtPassword = new TextField();
+	    Label lblAge = new Label("Enter Age (Optional):");
+	    TextField txtAge = new TextField();
+	    Label lblGender = new Label("Select Gender (Optional):");
+	    ComboBox<String> cmbGender = new ComboBox<>();
+	    cmbGender.getItems().addAll("Male", "Female", "Other");
+	    cmbGender.setValue("Other");
+	    Label lblEmail = new Label("Enter Email (Optional):");
+	    TextField txtEmail = new TextField();
+	    Label lblPosition = new Label("Select Position (Optional):");
+	    ComboBox<String> cmbPosition = new ComboBox<>();
+	    cmbPosition.getItems().addAll("Sales Associate", "Cashier", "Warehouse Manager", "HR Specialist", "Marketing Manager", "Operations Manager", "IT Support", "Customer Service Representative");
+	    cmbPosition.setValue("Customer Service Representative"); // Default value
+	    Label lblSalary = new Label("Enter Salary (Optional):");
+	    TextField txtSalary = new TextField();
+	    Label lblWorkedSince = new Label("Worked Since (Optional):");
+	    TextField txtWorkedSince = new TextField(LocalDate.now().getMonth().toString() + " " + LocalDate.now().getYear());
+	
+	    Button btnCreate = new Button("Create");
+	
+	    btnCreate.setOnAction(e -> {
+	        String username = txtUsername.getText().trim();
+	        String password = txtPassword.getText().trim();
+	        if (!username.isEmpty() && !password.isEmpty()) {
+	            Staff newStaff = new Staff(username, password);
+	            if (!txtAge.getText().isEmpty()) newStaff.setAge(Integer.parseInt(txtAge.getText().trim()));
+	            newStaff.setGender(cmbGender.getValue());
+	            if (!txtEmail.getText().isEmpty()) newStaff.setEmail(txtEmail.getText().trim());
+	            newStaff.setPosition(cmbPosition.getValue());
+	            if (!txtSalary.getText().isEmpty()) newStaff.setSalary(Double.parseDouble(txtSalary.getText().trim()));
+	            newStaff.setWorkedSince(txtWorkedSince.getText().trim());
+	            staffList.add(newStaff);
+	            showAlert("Create New Staff", "Staff member " + username + " created successfully.");
+	            createStage.close();
+	        } else {
+	            showAlert("Error", "Username and password are mandatory.");
+	        }
+	    });
+	
+	    VBox vbox = new VBox(10, lblUsername, txtUsername, lblPassword, txtPassword, lblAge, txtAge, lblGender, cmbGender, lblEmail, txtEmail, lblPosition, cmbPosition, lblSalary, txtSalary, lblWorkedSince, txtWorkedSince, btnCreate);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 400, 500);
+	    createStage.setScene(scene);
+	    createStage.show();
+	}
+	
+	private void changeStaffDetails() {
+	    Stage changeStage = new Stage();
+	    changeStage.setTitle("Change Staff Details");
+	
+	    Label lblUsername = new Label("Enter Username:");
+	    TextField txtUsername = new TextField();
+	    Label lblSalary = new Label("New Salary:");
+	    TextField txtSalary = new TextField();
+	    Label lblPosition = new Label("New Position:");
+	    ComboBox<String> cmbPosition = new ComboBox<>();
+	    cmbPosition.getItems().addAll("Sales Associate", "Cashier", "Warehouse Manager", "HR Specialist", "Marketing Manager", "Operations Manager", "IT Support", "Customer Service Representative");
+	
+	    Button btnChange = new Button("Change");
+	
+	    btnChange.setOnAction(e -> {
+	        String username = txtUsername.getText().trim();
+	        Staff staff = findStaffByUsername(username);
+	        if (staff == null) {
+	            showAlert("Error", "Staff member not found.");
+	            return;
+	        }
+	        if (!txtSalary.getText().isEmpty()) staff.setSalary(Double.parseDouble(txtSalary.getText().trim()));
+	        staff.setPosition(cmbPosition.getValue());
+	        showAlert("Change Staff Details", "Details updated successfully.");
+	        changeStage.close();
+	    });
+	
+	    VBox vbox = new VBox(10, lblUsername, txtUsername, lblSalary, txtSalary, lblPosition, cmbPosition, btnChange);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 300);
+	    changeStage.setScene(scene);
+	    changeStage.show();
+	}
+	
+	private Staff findStaffByUsername(String username) {
+	    for (Staff staff : staffList) {
+	        if (staff.getUsername().equals(username)) {
+	            return staff;
+	        }
+	    }
+	    return null;
+	}
+	
+	private void addNewStaff(String username, String password) {
+	    Staff newStaff = new Staff(username, password);
+	    staffList.add(newStaff);
+	}
 
-    canvas.widthProperty().addListener((obs, oldVal, newVal) -> {
-        viewGraph(gc);
-    });
+	private void deleteOldStaff() {
+	    Stage deleteStage = new Stage();
+	    deleteStage.setTitle("Delete Staff");
+	
+	    Label lblUsername = new Label("Enter Username:");
+	    TextField txtUsername = new TextField();
+	    Button btnDelete = new Button("Delete");
+	
+	    btnDelete.setOnAction(e -> {
+	        String username = txtUsername.getText().trim();
+	        if (!username.isEmpty()) {
+	            deleteStaff(username);
+	            showAlert("Delete Staff", "Staff member " + username + " deleted successfully.");
+	            deleteStage.close();
+	        } else {
+	            showAlert("Error", "Username cannot be empty.");
+	        }
+	    });
+	
+	    VBox vbox = new VBox(10, lblUsername, txtUsername, btnDelete);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 150);
+	    deleteStage.setScene(scene);
+	    deleteStage.show();
+	}
+	
+	private void deleteStaff(String username) {
+	    staffList.removeIf(staff -> staff.getUsername().equals(username));
+	}
 
-    canvas.heightProperty().addListener((obs, oldVal, newVal) -> {
-        viewGraph(gc);
-    });
+	private void resetStaffPassword() {
+	    Stage resetStage = new Stage();
+	    resetStage.setTitle("Reset Staff Password");
+	
+	    Label lblUsername = new Label("Enter Staff Username:");
+	    TextField txtUsername = new TextField();
+	    Button btnReset = new Button("Reset Password");
+	
+	    btnReset.setOnAction(e -> {
+	        String username = txtUsername.getText().trim();
+	        if (!username.isEmpty()) {
+	            resetPasswordForStaff(username);
+	            showAlert("Reset Password", "Password for " + username + " has been reset to 'Staff123'.");
+	            resetStage.close();
+	        } else {
+	            showAlert("Error", "Username cannot be empty.");
+	        }
+	    });
+	
+	    VBox vbox = new VBox(10, lblUsername, txtUsername, btnReset);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 150);
+	    resetStage.setScene(scene);
+	    resetStage.show();
+	}
+	
+	private void resetPasswordForStaff(String username) {
+	    for (Staff staff : staffList) {
+	        if (staff.getUsername().equals(username)) {
+	            staff.setPassword("Staff123");
+	            break;
+	        }
+	    }
+	}
+	
+	private void showProfilePage() {
+	    if (loggedInUser == null || !"Staff".equals(loggedInUser.getRole())) {
+	        showAlert("Access Denied", "You must be logged in as a Staff to view the profile.");
+	        return;
+	    }
+	
+	    Staff staff = (Staff) loggedInUser; // Cast loggedInUser to Staff
+	
+	    Stage profileStage = new Stage();
+	    profileStage.setTitle("Profile");
+	
+	    // Profile details
+	    Label lblName = new Label("Name: " + staff.getUsername());
+	    Label lblAge = new Label("Age: " + staff.getAge());
+	    Label lblGender = new Label("Gender: " + staff.getGender());
+	    Label lblEmail = new Label("Email: " + staff.getEmail());
+	    Label lblPosition = new Label("Position: " + staff.getRole());
+	    Label lblSalary = new Label("Salary: $" + staff.getSalary());
+	    Label lblWorkedSince = new Label("Worked since: " + staff.getWorkedSince());
+	
+	    // Buttons for profile actions
+	    Button btnReturnToMenu = new Button("Return to main menu");
+	    btnReturnToMenu.setOnAction(e -> profileStage.close());
+	
+	    Button btnEditProfile = new Button("Edit profile");
+	    btnEditProfile.setOnAction(e -> editProfile());
+	
+	    Button btnChangePassword = new Button("Change password");
+	    btnChangePassword.setOnAction(e -> changePassword());
+	
+	    VBox vbox = new VBox(10, lblName, lblAge, lblGender, lblEmail, lblPosition, lblSalary, lblWorkedSince, 
+	                         btnReturnToMenu, btnEditProfile, btnChangePassword);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 400);
+	    profileStage.setScene(scene);
+	    profileStage.show();
+	}
 
-    // Ensure the stage is not resizable to fullscreen on launch
-    mainStage.setResizable(true);
-    mainStage.setMaximized(false);  // Prevents the stage from launching maximized
+	private void editProfile() {
+	    if (loggedInUser == null || !"Staff".equals(loggedInUser.getRole())) {
+	        showAlert("Access Denied", "You must be logged in as a Staff to edit the profile.");
+	        return;
+	    }
+	
+	    Staff staff = (Staff) loggedInUser; // Correctly cast loggedInUser to Staff
+	
+	    Stage editStage = new Stage();
+	    editStage.setTitle("Edit Profile");
+	
+	    TextField txtName = new TextField(staff.getUsername());
+	    TextField txtAge = new TextField(String.valueOf(staff.getAge()));
+	    
+	    ComboBox<String> cmbGender = new ComboBox<>();
+	    cmbGender.getItems().addAll("Male", "Female", "Other");
+	    cmbGender.setValue(staff.getGender()); // Use correctly initialized staff reference
+	    
+	    TextField txtEmail = new TextField(staff.getEmail());
+	
+	    Button btnSave = new Button("Save");
+	    btnSave.setOnAction(e -> {
+	        staff.setUsername(txtName.getText().trim());
+	        staff.setAge(Integer.parseInt(txtAge.getText().trim()));
+	        staff.setGender(cmbGender.getValue());
+	        staff.setEmail(txtEmail.getText().trim());
+	        showAlert("Edit Profile", "Profile updated successfully.");
+	        editStage.close();
+	    });
+	
+	    VBox vbox = new VBox(10, new Label("Name:"), txtName, new Label("Age:"), txtAge,
+	                         new Label("Gender:"), cmbGender, new Label("Email:"), txtEmail, btnSave);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 300);
+	    editStage.setScene(scene);
+	    editStage.show();
+	}
 
-    // Display the stage
-    mainStage.show();
-}
 
-    private void showMainMenu(GraphicsContext gc) {
-        mainStage.setTitle("Airline System");
-
-        Label lblStart = new Label("Start Airport Code:");
-        TextField txtStart = new TextField();
-        Label lblEnd = new Label("End Airport Code:");
-        TextField txtEnd = new TextField();
-
-        Button btnAlgorithms = new Button("Algorithms");
-        Button btnEditor = new Button("Editor");
-        Button btnAirportInfo = new Button("Airport Info");
-        btnLoginLogout = new Button(loggedInUser == null ? "Login" : "Logout");
-        lblCurrentUser = new Label(getCurrentUserText());
-
-        HBox inputBox = new HBox(10, lblStart, txtStart, lblEnd, txtEnd);
-
-        // Create and style the login box
-        createLoginBox();
-        VBox loginContainer = new VBox(10, loginBox, btnLoginLogout);
-        loginContainer.setPadding(new Insets(10));
-        loginContainer.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: #f0f0f0;");
-
-        // Create and style the button box
-        VBox buttonBox = new VBox(10, btnAlgorithms, btnEditor, btnAirportInfo, lblCurrentUser);
-        buttonBox.setPadding(new Insets(10));
-        buttonBox.setStyle("-fx-border-color: black; -fx-border-width: 1; -fx-background-color: #f0f0f0;");
-
-        // Adjust the layout to place the login box above the button box
-        VBox rightContainer = new VBox(20, loginContainer, buttonBox);  // Login box above the button box
-        rightContainer.setPadding(new Insets(10));  // Add padding to the right container
-
-        BorderPane root = new BorderPane();
-        root.setTop(inputBox);
-        root.setCenter(canvas);
-        root.setRight(rightContainer);
-
-        Scene scene = new Scene(root, 1000, 800);
-        mainStage.setScene(scene);
-
-        // Set up event handlers for buttons
-        btnAlgorithms.setOnAction(e -> showAlgorithmsMenu(gc, txtStart, txtEnd));
-        btnEditor.setOnAction(e -> {
-            if (loggedInUser != null && (loggedInUser.getRole().equals("Staff") || loggedInUser.getRole().equals("Admin"))) {
-                showEditorMenu(gc);
-            } else {
-                showAlert("Access Denied", "You must be logged in as a Staff or Admin to access the editor.");
-            }
-        });
-        btnAirportInfo.setOnAction(e -> showAirportInfo());
-        btnLoginLogout.setOnAction(e -> {
-            if (loggedInUser == null) {
-                loginUser();
-            } else {
-                logoutUser(gc);
-            }
-        });
-    }
+	private void changePassword() {
+	    if (loggedInUser == null || !"Staff".equals(loggedInUser.getRole())) {
+	        showAlert("Access Denied", "You must be logged in as a Staff to change the password.");
+	        return;
+	    }
+	
+	    Staff staff = (Staff) loggedInUser; // Cast loggedInUser to Staff
+	
+	    Stage passwordStage = new Stage();
+	    passwordStage.setTitle("Change Password");
+	
+	    PasswordField txtOldPassword = new PasswordField();
+	    txtOldPassword.setPromptText("Enter old password");
+	    PasswordField txtNewPassword = new PasswordField();
+	    txtNewPassword.setPromptText("Enter new password");
+	    PasswordField txtConfirmPassword = new PasswordField();
+	    txtConfirmPassword.setPromptText("Confirm new password");
+	
+	    Button btnChange = new Button("Change Password");
+	    btnChange.setOnAction(e -> {
+	        String oldPassword = txtOldPassword.getText();
+	        String newPassword = txtNewPassword.getText();
+	        String confirmPassword = txtConfirmPassword.getText();
+	
+	        if (!staff.getPassword().equals(oldPassword)) {
+	            showAlert("Change Password", "Old password is incorrect.");
+	        } else if (!newPassword.equals(confirmPassword)) {
+	            showAlert("Change Password", "New passwords do not match.");
+	        } else {
+	            staff.setPassword(newPassword);
+	            showAlert("Change Password", "Password changed successfully.");
+	            passwordStage.close();
+	        }
+	    });
+	
+	    VBox vbox = new VBox(10, txtOldPassword, txtNewPassword, txtConfirmPassword, btnChange);
+	    vbox.setPadding(new Insets(10));
+	
+	    Scene scene = new Scene(vbox, 300, 200);
+	    passwordStage.setScene(scene);
+	    passwordStage.show();
+	}
 
     private void createLoginBox() {
         txtUsername = new TextField();
@@ -361,45 +723,36 @@ public class AirlineSystem extends Application {
         dialogStage.show();
     }
 
-    private void addConnection() {
-        Stage dialogStage = new Stage();
-        dialogStage.setTitle("Add Connection");
-
-        Label lblFrom = new Label("From Airport:");
-        TextField txtFrom = new TextField();
-        Label lblTo = new Label("To Airport:");
-        TextField txtTo = new TextField();
-        Label lblDistance = new Label("Distance:");
-        TextField txtDistance = new TextField();
-        Button btnAdd = new Button("Add");
-
-        btnAdd.setOnAction(e -> {
-            String from = txtFrom.getText().trim().toUpperCase();
-            String to = txtTo.getText().trim().toUpperCase();
-            int distance;
-            try {
-                distance = Integer.parseInt(txtDistance.getText().trim());
-            } catch (NumberFormatException ex) {
-                showAlert("Add Connection", "Invalid distance. Please enter a valid number.");
-                return;
-            }
-            if (from.isEmpty() || to.isEmpty() || distance <= 0) {
-                showAlert("Add Connection", "Please enter valid airport codes and a positive distance.");
-            } else if (!graph.hasVertex(from) || !graph.hasVertex(to)) {
-                showAlert("Add Connection", "One or both airport codes do not exist.");
-            } else {
-                graph.addConnection(from, to, distance);
-                showAlert("Add Connection", "Connection from " + from + " to " + to + " added.");
-                viewGraph(canvas.getGraphicsContext2D()); // Refresh graph view
-                dialogStage.close();
-            }
-        });
-
-        VBox dialogBox = new VBox(10, lblFrom, txtFrom, lblTo, txtTo, lblDistance, txtDistance, btnAdd);
-        Scene dialogScene = new Scene(dialogBox, 300, 200);
-        dialogStage.setScene(dialogScene);
-        dialogStage.show();
-    }
+	private void addConnection() {
+	    Stage dialogStage = new Stage();
+	    dialogStage.setTitle("Add Connection");
+	
+	    Label lblFrom = new Label("From Airport:");
+	    TextField txtFrom = new TextField();
+	    Label lblTo = new Label("To Airport:");
+	    TextField txtTo = new TextField();
+	    Button btnAdd = new Button("Add");
+	
+	    btnAdd.setOnAction(e -> {
+	        String from = txtFrom.getText().trim().toUpperCase();
+	        String to = txtTo.getText().trim().toUpperCase();
+	        if (from.isEmpty() || to.isEmpty()) {
+	            showAlert("Add Connection", "Please enter both airport codes.");
+	        } else if (!graph.hasVertex(from) || !graph.hasVertex(to)) {
+	            showAlert("Add Connection", "One or both airport codes do not exist.");
+	        } else {
+	            graph.addConnection(from, to);  // Adding connection without distance
+	            showAlert("Add Connection", "Connection from " + from + " to " + to + " added.");
+	            viewGraph(canvas.getGraphicsContext2D()); // Refresh graph view
+	            dialogStage.close();
+	        }
+	    });
+	
+	    VBox dialogBox = new VBox(10, lblFrom, txtFrom, lblTo, txtTo, btnAdd);
+	    Scene dialogScene = new Scene(dialogBox, 300, 200);
+	    dialogStage.setScene(dialogScene);
+	    dialogStage.show();
+	}
 
     private void removeConnection() {
         Stage dialogStage = new Stage();
@@ -547,7 +900,7 @@ public class AirlineSystem extends Application {
         };
         
         for (String[] connection : connections) {
-            graph.addConnection(connection[0].toUpperCase(), connection[1].toUpperCase(), 1);
+            graph.addConnection(connection[0].toUpperCase(), connection[1].toUpperCase());
         }
     }
 

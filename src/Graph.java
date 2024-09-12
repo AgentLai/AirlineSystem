@@ -22,11 +22,18 @@ public class Graph {
             connections.remove(code);
         }
     }
+    
+	public void addConnection(String from, String to) {
+	    // Ensure both airports exist in the graph before adding a connection
+	    if (!adjList.containsKey(from) || !adjList.containsKey(to)) {
+	        throw new IllegalArgumentException("One or both airports do not exist.");
+	    }
+	
+	    // Add the connection without distance
+	    adjList.get(from).put(to, 0); // Use a default or placeholder value (e.g., 0) for distance
+	    adjList.get(to).put(from, 0); // Use a default or placeholder value (e.g., 0) for distance
+	}
 
-    public void addConnection(String from, String to, int distance) {
-        adjList.get(from).put(to, distance);
-        adjList.get(to).put(from, distance);
-    }
 
     public void removeConnection(String from, String to) {
         if (adjList.containsKey(from)) {
@@ -83,44 +90,49 @@ public class Graph {
         return visited;
     }
 
-    public List<String> findShortestPath(String start, String end) {
-        Map<String, String> previous = new HashMap<>();
-        Map<String, Integer> distances = new HashMap<>();
-        Set<String> visited = new HashSet<>();
-        PriorityQueue<String> pq = new PriorityQueue<>(Comparator.comparingInt(distances::get));
+	public List<String> findShortestPath(String start, String end) {
+	    Map<String, String> previous = new HashMap<>(); 
+	    Set<String> visited = new HashSet<>(); 
+	    Queue<String> queue = new LinkedList<>(); 
+	
+	    queue.add(start);
+	    visited.add(start);
+	
+	    while (!queue.isEmpty()) {
+	        String current = queue.poll();
+	
+	        if (current.equals(end)) {
+	            break;
+	        }
+	
+	        for (String neighbor : adjList.get(current).keySet()) {
+	            if (!visited.contains(neighbor)) {
+	                queue.add(neighbor);
+	                visited.add(neighbor);
+	                previous.put(neighbor, current);
+	
+	                if (neighbor.equals(end)) {
+	                    break;
+	                }
+	            }
+	        }
+	    }
+	
+	    List<String> path = new ArrayList<>();
+	    for (String at = end; at != null; at = previous.get(at)) {
+	        path.add(at);
+	    }
+	    Collections.reverse(path);
+	
+	    // Check if the start is in the path; if not, return an empty list
+	    if (path.get(0).equals(start)) {
+	        return path;
+	    } else {
+	        return new ArrayList<>();
+	    }
+	}
 
-        distances.put(start, 0);
-        pq.add(start);
 
-        while (!pq.isEmpty()) {
-            String current = pq.poll();
-            if (current.equals(end)) break;
-            visited.add(current);
-
-            for (Map.Entry<String, Integer> neighbor : adjList.get(current).entrySet()) {
-                if (visited.contains(neighbor.getKey())) continue;
-
-                int newDist = distances.get(current) + neighbor.getValue();
-                if (newDist < distances.getOrDefault(neighbor.getKey(), Integer.MAX_VALUE)) {
-                    distances.put(neighbor.getKey(), newDist);
-                    previous.put(neighbor.getKey(), current);
-                    pq.add(neighbor.getKey());
-                }
-            }
-        }
-
-        List<String> path = new ArrayList<>();
-        for (String at = end; at != null; at = previous.get(at)) {
-            path.add(at);
-        }
-        Collections.reverse(path);
-
-        if (path.get(0).equals(start)) {
-            return path;
-        } else {
-            return new ArrayList<>();
-        }
-    }
 
     public void draw(GraphicsContext gc, Map<String, double[]> positions) {
         for (Map.Entry<String, Map<String, Integer>> entry : adjList.entrySet()) {
